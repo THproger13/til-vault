@@ -7,5 +7,7 @@
 
 - [[RabbitMQ 메시지 흐름]] — (예시) 프로듀서·익스체인지·큐·컨슈머 흐름과 prefetch·ack의 위치 (draft)
 - [[RabbitMQ prefetch]] — (예시) 컨슈머가 ack 없이 미리 받아두는 메시지 수, 너무 크면 한쪽에 몰림 (draft)
+- [[메시지 큐]] — 메시지 큐 관련 개념을 묶는 부모 노트, DLQ 위치 다이어그램 (draft)
+- [[DLQ]] — Dead Letter Queue, 처리되지 않은 메시지가 모이는 큐 (draft)
 
 ## 개발 외 (life)

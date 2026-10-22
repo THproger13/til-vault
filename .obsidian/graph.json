@@ -1,0 +1,14 @@
+{
+  "search": "-path:life -path:archive -path:templates -path:90-daily -path:dashboards -path:00-inbox -path:20-posts -path:30-ideas -path:config",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "colorGroups": [
+    { "query": "tag:#boss", "color": { "a": 1, "rgb": 15022389 } },
+    { "query": "[status:published]", "color": { "a": 1, "rgb": 16098851 } },
+    { "query": "[status:reviewed]", "color": { "a": 1, "rgb": 4886754 } },
+    { "query": "[status:draft]", "color": { "a": 1, "rgb": 10395294 } },
+    { "query": "[status:unexplored]", "color": { "a": 1, "rgb": 14079702 } }
+  ]
+}

@@ -1,0 +1,21 @@
+views:
+  - type: table
+    name: 글 후보와 발행
+    filters:
+      and:
+        - file.inFolder("10-concepts")
+        - 'post_format != "none"'
+    order:
+      - file.name
+      - note.post_format
+      - note.captured_at
+      - note.published_at
+      - note.status
+  - type: table
+    name: 글감 창고
+    filters:
+      and:
+        - file.inFolder("30-ideas")
+    order:
+      - file.name
+      - file.mtime

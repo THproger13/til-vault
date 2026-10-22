@@ -1,0 +1,22 @@
+filters:
+  and:
+    - file.inFolder("10-concepts")
+views:
+  - type: table
+    name: 확신 낮은 카드 (먼저 보기)
+    filters:
+      and:
+        - file.hasTag("check")
+    order:
+      - file.name
+      - note.status
+      - note.captured_at
+  - type: table
+    name: 미검수 노트
+    filters:
+      and:
+        - 'status == "draft"'
+    order:
+      - file.name
+      - note.cards
+      - note.captured_at

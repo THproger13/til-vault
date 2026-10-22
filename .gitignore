@@ -1,0 +1,12 @@
+# Obsidian 개인 화면 상태 (기기마다 다름)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.trash/
+.DS_Store
+.obsidian/workspaces.json
+# 윈도우 탐색기 부산물
+Thumbs.db
+desktop.ini
+# 충돌 시 생기는 임시 파일
+*.orig

@@ -1,0 +1,22 @@
+filters:
+  and:
+    - file.inFolder("90-daily")
+views:
+  - type: table
+    name: 퀘스트
+    filters:
+      and:
+        - 'type == "quest"'
+    order:
+      - file.name
+      - note.week
+      - note.season
+  - type: table
+    name: 주간 리포트
+    filters:
+      and:
+        - 'type == "report"'
+    order:
+      - file.name
+      - note.week
+      - note.season

@@ -1,0 +1,11 @@
+filters:
+  and:
+    - file.inFolder("10-concepts")
+    - file.hasTag("boss")
+views:
+  - type: table
+    name: 보스 목록
+    order:
+      - file.name
+      - note.prerequisite
+      - note.status

@@ -1,0 +1,14 @@
+# 맥·윈도우·클라우드 어디서 열어도 같은 파일이 되도록 줄바꿈을 LF로 고정
+* text=auto eol=lf
+*.md text eol=lf
+*.base text eol=lf
+*.json text eol=lf
+*.canvas text eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.pdf binary
+*.mp3 binary
+*.m4a binary

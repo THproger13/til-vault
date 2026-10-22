@@ -9,14 +9,14 @@ views:
         - file.hasTag("check")
     order:
       - file.name
-      - note.status
-      - note.captured_at
+      - status
+      - captured_at
   - type: table
     name: 미검수 노트
     filters:
       and:
-        - 'status == "draft"'
+        - status == "draft"
     order:
       - file.name
-      - note.cards
-      - note.captured_at
+      - cards
+      - captured_at

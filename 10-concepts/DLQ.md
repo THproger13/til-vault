@@ -27,3 +27,10 @@ DLQ(Dead Letter Queue)는 처리되지 않은 메시지를 따로 모아두는 �
 ## 복습 카드
 DLQ는 무엇의 약자인가?::Dead Letter Queue
 DLQ에는 어떤 메시지가 모이는가?::처리되지 않은 메시지
+
+## 복습 기록
+- 2026-10-23 (Claude 말로 복습) Q: 메시지가 DLQ로 가는 경우는?
+  - 내 대답: 소비자(WAS)가 처리 중 죽으면 처리 중이던 메시지가 사라지는 것을 막는다.
+  - 교정: 소비자가 죽었을 때 메시지를 지키는 건 DLQ가 아니라 수동 ack다. 수동 ack에서 ack 안 된 메시지는 채널·연결이 끊기면 큐로 자동 재전달되고, 자동 ack면 그냥 유실된다(DLQ로도 안 감). ([Consumer Acknowledgements](https://www.rabbitmq.com/docs/confirms))
+  - DLQ로 가는 경우는 4가지: ① 소비자가 reject/nack(requeue=false) ② 메시지 TTL 만료 ③ 큐 길이 한도 초과 ④ quorum 큐의 재전달 횟수 한도 초과. ([Dead Letter Exchanges](https://www.rabbitmq.com/docs/dlx))
+  - 결과: 오개념 1개 → `check` 유지, 다음 복습에서 다시 묻기

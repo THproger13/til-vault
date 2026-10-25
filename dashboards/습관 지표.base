@@ -4,13 +4,13 @@ views:
     filters:
       and:
         - file.inFolder("10-concepts")
-        - 'post_format != "none"'
+        - post_format != "none"
     order:
       - file.name
-      - note.post_format
-      - note.captured_at
-      - note.published_at
-      - note.status
+      - post_format
+      - captured_at
+      - published_at
+      - status
   - type: table
     name: 글감 창고
     filters:

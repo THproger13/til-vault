@@ -1,14 +1,58 @@
 {
+  "collapse-filter": true,
   "search": "-path:life -path:archive -path:templates -path:90-daily -path:dashboards -path:00-inbox -path:20-posts -path:30-ideas -path:config",
   "showTags": false,
   "showAttachments": false,
   "hideUnresolved": false,
   "showOrphans": true,
+  "collapse-color-groups": true,
   "colorGroups": [
-    { "query": "tag:#boss", "color": { "a": 1, "rgb": 15022389 } },
-    { "query": "[status:published]", "color": { "a": 1, "rgb": 16098851 } },
-    { "query": "[status:reviewed]", "color": { "a": 1, "rgb": 4886754 } },
-    { "query": "[status:draft]", "color": { "a": 1, "rgb": 10395294 } },
-    { "query": "[status:unexplored]", "color": { "a": 1, "rgb": 14079702 } }
-  ]
+    {
+      "query": "tag:#boss",
+      "color": {
+        "a": 1,
+        "rgb": 15022389
+      }
+    },
+    {
+      "query": "[status:published]",
+      "color": {
+        "a": 1,
+        "rgb": 16098851
+      }
+    },
+    {
+      "query": "[status:reviewed]",
+      "color": {
+        "a": 1,
+        "rgb": 4886754
+      }
+    },
+    {
+      "query": "[status:draft]",
+      "color": {
+        "a": 1,
+        "rgb": 10395294
+      }
+    },
+    {
+      "query": "[status:unexplored]",
+      "color": {
+        "a": 1,
+        "rgb": 14079702
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": false,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1,
+  "lineSizeMultiplier": 1,
+  "collapse-forces": true,
+  "centerStrength": 0.518713248970312,
+  "repelStrength": 10,
+  "linkStrength": 1,
+  "linkDistance": 250,
+  "scale": 1,
+  "close": false
 }

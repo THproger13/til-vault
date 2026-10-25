@@ -7,5 +7,5 @@ views:
     name: 보스 목록
     order:
       - file.name
-      - note.prerequisite
-      - note.status
+      - prerequisite
+      - status

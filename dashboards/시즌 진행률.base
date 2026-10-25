@@ -1,15 +1,14 @@
-# 시즌이 바뀌면 아래 season 값만 바꾼다.
 filters:
   and:
     - file.inFolder("10-concepts")
-    - 'season == "2026-S1"'
+    - season == "2026-S1"
 views:
   - type: table
     name: 이번 시즌 씨앗
     groupBy:
-      property: note.status
+      property: status
       direction: ASC
     order:
       - file.name
-      - note.status
-      - note.part_of
+      - status
+      - part_of

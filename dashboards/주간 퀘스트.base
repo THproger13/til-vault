@@ -6,17 +6,17 @@ views:
     name: 퀘스트
     filters:
       and:
-        - 'type == "quest"'
+        - type == "quest"
     order:
       - file.name
-      - note.week
-      - note.season
+      - week
+      - season
   - type: table
     name: 주간 리포트
     filters:
       and:
-        - 'type == "report"'
+        - type == "report"
     order:
       - file.name
-      - note.week
-      - note.season
+      - week
+      - season

@@ -10,3 +10,5 @@ Thumbs.db
 desktop.ini
 # 충돌 시 생기는 임시 파일
 *.orig
+# 기기별 상태를 매일 고쳐 써서 충돌 나는 플러그인 데이터
+.obsidian/plugins/obsidian-spaced-repetition/data.json

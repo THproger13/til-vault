@@ -5,8 +5,6 @@
 
 ## 개발
 
-- [[RabbitMQ 메시지 흐름]] — (예시) 프로듀서·익스체인지·큐·컨슈머 흐름과 prefetch·ack의 위치 (draft)
-- [[RabbitMQ prefetch]] — (예시) 컨슈머가 ack 없이 미리 받아두는 메시지 수, 너무 크면 한쪽에 몰림 (draft)
 - [[메시지 큐]] — 묶음 노트(hub). RabbitMQ 큐 개요, 하위 DLQ와 다음에 볼 개념 지도 (draft)
 - [[DLQ]] — DLX를 거쳐 처리 못 한 메시지가 모이는 일반 큐. 4가지 경우, DLX 없으면 조용히 버려짐, 4.0 quorum 기본 delivery-limit 20 등 운영 시나리오. 소비자 장애 대비는 수동 ack (draft, 말로 복습 대기)
 - [[리눅스 파일시스템]] — 묶음 노트(hub). 트리 하나와 여러 장치를 잇는 마운트 개요, 하위 개념 지도 (draft)

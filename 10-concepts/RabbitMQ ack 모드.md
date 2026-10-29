@@ -20,7 +20,7 @@ generated_at: 2026-10-29
 소비자가 메시지를 처리했다고 브로커에 알리는 방식이다. 자동 ack는 보내는 순간 성공으로 처리해서 소비자가 죽으면 메시지가 사라지고, 수동 ack는 ack 전에 연결이 끊긴 메시지를 큐로 다시 돌려보낸다.
 
 ## 어디서 나왔나
-- [[DLQ]]의 선행 개념, [[RabbitMQ prefetch]]의 선행 개념
+- [[DLQ]]의 선행 개념
 
 ## 더 보기
 - [RabbitMQ: Consumer Acknowledgements](https://www.rabbitmq.com/docs/confirms)

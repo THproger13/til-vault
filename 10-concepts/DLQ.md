@@ -1,12 +1,19 @@
 ---
 title: DLQ
-tags: [messaging, rabbitmq, check]
+tags:
+  - messaging
+  - rabbitmq
+  - check
 status: draft
 sensitivity: public
 post_format: none
 cards: true
-prerequisite: ["[[메시지 큐]]", "[[RabbitMQ ack 모드]]", "[[DLX]]"]
-part_of: ["[[메시지 큐]]"]
+prerequisite:
+  - "[[메시지 큐]]"
+  - "[[RabbitMQ ack 모드]]"
+  - "[[DLX]]"
+part_of:
+  - "[[메시지 큐]]"
 compared_with: []
 situation:
 review_load: 10
@@ -14,8 +21,10 @@ captured_at: 2026-10-23
 answered_at: 2026-10-25
 published_at:
 generated_at: 2026-10-23
-review_count: 0
+review_count: 1
 next_review: 2026-11-01
+accuracy: 100
+last_reviewed: 2026-11-01
 ---
 
 ## 원본 메모
@@ -112,7 +121,7 @@ flowchart LR
 - [ ] 내 Spring 설정에서 `default-requeue-rejected`와 `acknowledge-mode`를 따로 지정했는지 (안 했으면 AUTO + requeue=true)
 
 ## 복습 카드
-- DLQ는 ==Dead Letter Queue==의 약자다.
+- DLQ는 ==Dead Letter Queue==의 약자다. <!--til:2026-11-04,3,1,1-->
 - DLQ에는 ==처리되지 않은 메시지|처리 안 된 메시지|처리 못 한 메시지==가 모인다.
 - 수동 ack 모드에서 ack 전에 연결이 끊긴 메시지는 ==큐로 자동 재전달|큐로 재전달|재전달==된다.
 - DLX로 지정한 교환기가 없으면 dead-letter 대상 메시지는 오류 없이 조용히 ==버려진다|버려짐|폐기된다==.

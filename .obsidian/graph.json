@@ -1,11 +1,11 @@
 {
-  "collapse-filter": true,
+  "collapse-filter": false,
   "search": "-path:life -path:archive -path:templates -path:90-daily -path:dashboards -path:00-inbox -path:20-posts -path:30-ideas -path:config",
-  "showTags": false,
-  "showAttachments": false,
-  "hideUnresolved": false,
+  "showTags": true,
+  "showAttachments": true,
+  "hideUnresolved": true,
   "showOrphans": true,
-  "collapse-color-groups": true,
+  "collapse-color-groups": false,
   "colorGroups": [
     {
       "query": "tag:#boss",
@@ -57,16 +57,16 @@
       }
     }
   ],
-  "collapse-display": true,
+  "collapse-display": false,
   "showArrow": false,
   "textFadeMultiplier": 0,
-  "nodeSizeMultiplier": 1,
+  "nodeSizeMultiplier": 1.10167560321716,
   "lineSizeMultiplier": 1,
   "collapse-forces": true,
   "centerStrength": 0.518713248970312,
   "repelStrength": 10,
   "linkStrength": 1,
   "linkDistance": 250,
-  "scale": 1,
+  "scale": 1.4935793978967453,
   "close": false
 }

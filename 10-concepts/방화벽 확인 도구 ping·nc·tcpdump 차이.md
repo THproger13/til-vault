@@ -1,6 +1,6 @@
 ---
 title: 방화벽 확인 도구 ping·nc·tcpdump 차이
-tags: [network, flashcards, check]
+tags: [network, check]
 status: draft
 sensitivity: public
 post_format: none
@@ -15,6 +15,8 @@ answered_at: 2026-10-30
 reviewed_at:
 published_at:
 generated_at: 2026-10-30
+review_count: 0
+next_review: 2026-11-01
 ---
 
 ## 원본 메모
@@ -125,8 +127,7 @@ IP·호스트명은 `<호스트 IP>`처럼 바꿔서 inbox에 `결과: ...` 한 
 - [ ] (가능하면) 받는 쪽 호스트 방화벽이 그 포트를 DROP할 때도 tcpdump에 SYN이 보이는지 확인한다 — 위 "check" 문장 검증용
 
 ## 복습 카드
-ping이 성공해도 특정 TCP 포트의 방화벽이 열렸다고 볼 수 없는 이유는?::ping은 포트 필드가 없는 ICMP 에코라서 TCP 포트별 규칙을 확인하지 못하기 때문이다
-nc -zv가 타임아웃일 때 받는 쪽에서 tcpdump를 같이 보는 이유는?::SYN이 받는 쪽까지 왔는지 보고 막힌 위치가 중간 장비인지 받는 쪽인지 가르기 위해서다
-<!--SR:!2026-11-02,1,230-->
+- `ping`은 포트 필드가 없는 ==ICMP== 에코라서, 성공해도 ==TCP 포트별 규칙|TCP 포트 규칙|포트별 규칙==이 열렸는지는 확인하지 못한다.
+- `nc -zv`가 타임아웃일 때 받는 쪽에서 `tcpdump`를 같이 보는 이유는 ==SYN==이 받는 쪽까지 왔는지 보고, 막힌 위치가 ==중간 장비==인지 받는 쪽인지 가르기 위해서다.
 
 ## 복습 기록

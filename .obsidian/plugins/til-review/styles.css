@@ -1,0 +1,15 @@
+.til-review-modal { width: min(720px, 92vw); }
+.til-review-head { display: flex; justify-content: space-between; color: var(--text-muted); font-size: var(--font-ui-small); margin-bottom: 12px; }
+.til-review-note { cursor: pointer; }
+.til-review-sentence { font-size: 1.15em; line-height: 2.2; margin-bottom: 16px; }
+.til-review-blank { display: inline-block; margin: 0 4px; padding: 2px 6px; border-bottom: 2px solid var(--interactive-accent); text-align: center; }
+.til-review-blank.is-correct { border-color: var(--color-green); background: rgba(var(--color-green-rgb), 0.12); }
+.til-review-blank.is-wrong { border-color: var(--color-red); background: rgba(var(--color-red-rgb), 0.12); text-decoration: line-through; }
+.til-review-answer { margin-right: 4px; padding: 1px 6px; border-radius: 4px; background: rgba(var(--color-green-rgb), 0.18); font-weight: 600; }
+.til-review-actions button, .til-review-intervals button { margin-right: 8px; margin-top: 4px; }
+.til-review-ok { color: var(--color-green); font-weight: 600; margin-bottom: 6px; }
+.til-review-ng { color: var(--color-red); font-weight: 600; margin-bottom: 6px; }
+.til-review-fix { margin-bottom: 8px; font-size: var(--font-ui-small); }
+.til-review-ask { color: var(--text-muted); font-size: var(--font-ui-small); margin: 8px 0 4px; }
+.til-review-intervals { display: flex; flex-wrap: wrap; align-items: center; }
+.til-review-custom { width: 7em; margin-top: 4px; }

@@ -4,7 +4,7 @@ description: 월요일 예약 작업 또는 "이번 주 글 뭐 쓸까" 요청 �
 ---
 # 글 후보 선정
 
-대상: `10-concepts/` 중 `status: reviewed`, `sensitivity: public`, `post_format: none` 노트.
+대상: `10-concepts/` 중 `status`가 `draft`·`reviewed`이고 `sensitivity: public`인 답 노트(허브·씨앗 제외). `reviewed`이거나 빈칸 복습 `review_count` 3 이상·`accuracy` 80 이상인 노트를 우선한다.
 
 1. 그래프 신호로 1차 후보 5개
    - 백링크와 `prerequisite`로 연결이 많은 개념
@@ -15,5 +15,5 @@ description: 월요일 예약 작업 또는 "이번 주 글 뭐 쓸까" 요청 �
    - 실제 검색량은 알 수 없다. "빈틈 추정"이라고만 표현한다.
 4. 월간 리포트에 Search Console 기록이 있으면, 노출이 많았던 유형을 가산점으로 쓴다.
 5. 최종 후보 2개와 묶음 후보 1개를 이번 주 퀘스트 파일의 "이번 주 글 후보" 섹션에 쓴다. 각 후보에 이유 한 줄.
-6. 사용자가 고른 노트만 `post_format`을 `short`/`long`으로 바꾼다. 자동으로 바꾸지 않는다.
+6. Claude는 `status`를 바꾸지 않는다. 사용자가 고른 노트를 Obsidian에서 `status: blog`로 바꾸면 다음 저녁 작업이 초안을 쓴다. 긴 글로 묶고 싶으면 사용자가 `post_format: long`도 함께 바꾼다.
 7. `30-ideas/`가 5개 미만이면 남은 후보로 채운다.

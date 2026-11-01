@@ -1,6 +1,6 @@
 ---
 title:
-tags: [flashcards, check]
+tags: [check]
 status: draft
 sensitivity: public
 post_format: none
@@ -10,9 +10,13 @@ part_of: []
 compared_with: []
 situation:
 review_load:
+review_count: 0
+next_review:
 captured_at:
 answered_at:
 reviewed_at:
+drafted_at:
+draft_path:
 published_at:
 generated_at:
 ---
@@ -43,6 +47,6 @@ generated_at:
 - [ ] `명령어 -옵션`: 확인할 것 (`-옵션` 뜻 풀이)
 
 ## 복습 카드
-질문::답
+- 외울 문장 한 줄에 ==핵심 키워드== 1~2개를 빈칸으로. 같은 뜻 표현은 ==수동 ack|manual ack==처럼 나눈다
 
 ## 복습 기록

@@ -1,12 +1,12 @@
 ---
 name: til-to-blog
-description: "블로그 초안 써줘" 요청 시 글 후보 노트를 기술 블로그 템플릿대로 초안으로 만든다.
+description: 저녁 작업이 status blog 노트를 찾았을 때, 또는 "블로그 초안 써줘" 요청 시 노트를 기술 블로그 템플릿대로 초안으로 만든다.
 ---
 # 블로그 초안
 
 먼저 `style-guide.md`와 `20-posts/published/`의 최근 발행본 2편(없으면 style-guide의 예시)을 읽는다.
 
-입력: `post_format`이 `short`/`long`이고 `status: reviewed`, `sensitivity: public`인 노트(묶음이면 여러 개).
+입력: `status: blog`이고 `sensitivity: public`인 노트(묶음이면 여러 개). 사용자가 대화에서 노트를 직접 지정하면 `draft`·`reviewed`여도 쓰되, 먼저 그 노트를 `blog`로 바꿀지 물어본다. `post_format`이 `none`이면 `short`로 쓴다.
 
 `templates/post.md` 순서를 지킨다.
 1. 검색 의도가 드러나는 제목 (문제·키워드 중심)
@@ -23,4 +23,4 @@ description: "블로그 초안 써줘" 요청 시 글 후보 노트를 기술 �
 
 짧은 글 최소 기준: 도표 1개, 경험 문단 1개, 공식 출처 1개. 못 채우면 초안 맨 위에 "발행 보류: 사유"를 적는다.
 
-`20-posts/drafts/YYYY-MM-DD-slug.md`로 저장하고, 사용자가 할 일 3가지(경험 문단 다듬기, 도표 확인, publish-guard)를 알려준다.
+`20-posts/drafts/YYYY-MM-DD-slug.md`로 저장한다. 초안 맨 위 속성에 `source_notes: ["[[노트명]]"]`을 남긴다. 원본 노트는 `status: drafted`, `drafted_at`, `draft_path`만 바꾸고 본문은 고치지 않는다. 사용자가 할 일 3가지(경험 문단 다듬기, 도표 확인, publish-guard)를 알려준다.

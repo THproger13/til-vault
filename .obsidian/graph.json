@@ -22,6 +22,20 @@
       }
     },
     {
+      "query": "[status:drafted]",
+      "color": {
+        "a": 1,
+        "rgb": 10711543
+      }
+    },
+    {
+      "query": "[status:blog]",
+      "color": {
+        "a": 1,
+        "rgb": 2991182
+      }
+    },
+    {
       "query": "[status:reviewed]",
       "color": {
         "a": 1,
@@ -39,7 +53,7 @@
       "query": "[status:unexplored]",
       "color": {
         "a": 1,
-        "rgb": 14079702
+        "rgb": 13619151
       }
     }
   ],

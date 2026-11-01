@@ -1,0 +1,9 @@
+{
+  "id": "til-review",
+  "name": "TIL 빈칸 복습",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "개념 노트의 ==키워드== 빈칸 카드를 입력해서 맞히고, 다음 복습일을 직접 고른다. 복습 횟수·정답률·다음 복습일을 노트 속성에 기록한다.",
+  "author": "til-vault",
+  "isDesktopOnly": false
+}

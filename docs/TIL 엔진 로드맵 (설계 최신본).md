@@ -6,6 +6,8 @@ source_rev: 54
 exported_at: 2026-10-25
 ---
 
+> **2026-11-01 변경**: 복습은 Spaced Repetition 대신 볼트 전용 플러그인 `til-review`(빈칸 입력 + 다음 복습일 직접 선택)로, 상태 흐름은 `draft → (reviewed) → blog → drafted → published`로 바꿨다. 아래 본문과 다르면 `CLAUDE.md`와 `docs/볼트 폴더 운영 가이드.md`가 기준이다.
+
 > Claude Docs 원본을 마크다운으로 옮긴 사본이다. 원본이 바뀌면 이 파일은 자동으로 갱신되지 않는다.
 
 # TIL 엔진 중심 학습 시스템 & 사이드 수익화 로드맵

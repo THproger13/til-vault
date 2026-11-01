@@ -1,0 +1,88 @@
+{
+  "enableFeatures": {
+    "graph": {
+      "auto-enabled": true,
+      "links": true,
+      "properties": true,
+      "arrows": true
+    },
+    "localgraph": {
+      "auto-enabled": true,
+      "links": true,
+      "properties": true,
+      "arrows": true
+    }
+  },
+  "interactiveSettings": {
+    "link": {
+      "colormap": "rainbow",
+      "excludeRegex": {
+        "regex": "",
+        "flags": ""
+      },
+      "showOnGraph": true,
+      "enableByDefault": true,
+      "unselected": [],
+      "colors": [
+        {
+          "type": "prerequisite",
+          "color": "#e5534b"
+        },
+        {
+          "type": "part_of",
+          "color": "#4a90e2"
+        },
+        {
+          "type": "compared_with",
+          "color": "#d29922"
+        }
+      ],
+      "noneType": "none"
+    },
+    "status": {
+      "colormap": "rainbow",
+      "excludeRegex": {
+        "regex": "",
+        "flags": ""
+      },
+      "showOnGraph": true,
+      "enableByDefault": true,
+      "unselected": [],
+      "colors": [
+        {
+          "type": "unexplored",
+          "color": "#cfcfcf"
+        },
+        {
+          "type": "draft",
+          "color": "#9e9e9e"
+        },
+        {
+          "type": "reviewed",
+          "color": "#4a90e2"
+        },
+        {
+          "type": "blog",
+          "color": "#2da44e"
+        },
+        {
+          "type": "drafted",
+          "color": "#a371f7"
+        },
+        {
+          "type": "published",
+          "color": "#f5a623"
+        }
+      ],
+      "noneType": "none",
+      "undefinedType": "undefined",
+      "useForNodeColor": true
+    }
+  },
+  "additionalProperties": {
+    "status": {
+      "graph": true,
+      "localgraph": true
+    }
+  }
+}

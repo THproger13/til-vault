@@ -6,12 +6,12 @@
 ## 개발
 
 - [[메시지 큐]] — 묶음 노트(hub). RabbitMQ 큐 개요, 하위 DLQ와 다음에 볼 개념 지도 (draft)
-- [[DLQ]] — DLX를 거쳐 처리 못 한 메시지가 모이는 일반 큐. 4가지 경우, DLX 없으면 조용히 버려짐, 4.0 quorum 기본 delivery-limit 20 등 운영 시나리오. 소비자 장애 대비는 수동 ack. Spring AMQP 기본값(AUTO + requeue)의 무한 재전달 함정 예제 (draft, 말로 복습 대기)
+- [[DLQ]] — DLX를 거쳐 처리 못 한 메시지가 모이는 일반 큐. 4가지 경우, DLX 없으면 조용히 버려짐, 4.0 quorum 기본 delivery-limit 20 등 운영 시나리오. 소비자 장애 대비는 수동 ack. Spring AMQP 기본값(AUTO + requeue)의 무한 재전달 함정 예제 (draft)
 - [[리눅스 파일시스템]] — 묶음 노트(hub). 트리 하나와 여러 장치를 잇는 마운트 개요, 하위 개념 지도 (draft)
-- [[리눅스 디렉토리와 물리 디스크]] — 디렉토리 트리와 장치를 잇는 마운트, du·df·findmnt·lsblk가 보는 층의 차이, df·du 불일치 원인 (draft, 말로 복습 대기)
+- [[리눅스 디렉토리와 물리 디스크]] — 디렉토리 트리와 장치를 잇는 마운트, du·df·findmnt·lsblk가 보는 층의 차이, df·du 불일치 원인 (draft)
 - [[네트워크와 방화벽]] — 묶음 노트(hub). 서비스 문제와 방화벽 문제를 가르는 개요, 하위 개념 지도 (draft)
-- [[L4 포트 오픈 여부와 방화벽 상태]] — 포트 상태 3가지(열림·닫힘·필터됨)와 DROP·REJECT 구분, L4 리스너 포트와 대상 포트 두 구간 확인 (draft, 말로 복습 대기)
-- [[방화벽 확인 도구 ping·nc·tcpdump 차이]] — ping은 ICMP라 포트 방화벽을 못 봄, nc -zv는 TCP 포트 연결 결과, tcpdump는 한 지점에서 SYN 도착·응답 관찰. 공통 키워드 표 (draft, 말로 복습 대기)
+- [[L4 포트 오픈 여부와 방화벽 상태]] — 포트 상태 3가지(열림·닫힘·필터됨)와 DROP·REJECT 구분, L4 리스너 포트와 대상 포트 두 구간 확인 (draft)
+- [[방화벽 확인 도구 ping·nc·tcpdump 차이]] — ping은 ICMP라 포트 방화벽을 못 봄, nc -zv는 TCP 포트 연결 결과, tcpdump는 한 지점에서 SYN 도착·응답 관찰. 공통 키워드 표 (draft)
 
 ### 씨앗 (연관 개념, 아직 질문 전)
 

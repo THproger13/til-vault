@@ -12,6 +12,7 @@
 - [[네트워크와 방화벽]] — 묶음 노트(hub). 서비스 문제와 방화벽 문제를 가르는 개요, 하위 개념 지도 (draft)
 - [[L4 포트 오픈 여부와 방화벽 상태]] — 포트 상태 3가지(열림·닫힘·필터됨)와 DROP·REJECT 구분, L4 리스너 포트와 대상 포트 두 구간 확인 (draft)
 - [[방화벽 확인 도구 ping·nc·tcpdump 차이]] — ping은 ICMP라 포트 방화벽을 못 봄, nc -zv는 TCP 포트 연결 결과, tcpdump는 한 지점에서 SYN 도착·응답 관찰. 공통 키워드 표 (draft)
+- [[Podman과 Docker 엔진 차이]] — compose 파일은 같고 엔진이 다름. dockerd 데몬 vs 데몬 없음(conmon), docker.sock → podman.sock 링크, 재부팅 재시작(4.9는 always만), 저장소·rootless·로그 드라이버 차이, RHEL 8 패키지 충돌 (draft)
 
 ### 씨앗 (연관 개념, 아직 질문 전)
 
@@ -42,5 +43,14 @@
 - [[ICMP]] — 씨앗. IP 위의 오류·제어 메시지. ping과 도달 불가 오류, 포트 없음 (unexplored)
 - [[상태 기반 방화벽]] — 씨앗. 연결 상태를 추적해 응답 패킷을 통과시키는 방화벽 (unexplored)
 - [[pcap 필터 표현식]] — 씨앗. tcpdump가 볼 패킷을 고르는 문법 (unexplored)
+
+#### 컨테이너
+- [[컨테이너 엔진]] — 씨앗. 이미지를 받아 두고 컨테이너를 만들어 실행·관리하는 프로그램. Docker 엔진·Podman (unexplored)
+- [[데몬]] — 씨앗. 백그라운드에서 계속 도는 서비스 프로세스. dockerd (unexplored)
+- [[OCI 런타임]] — 씨앗. 컨테이너를 실제로 만드는 맨 아래 층(runc, crun) (unexplored)
+- [[유닉스 도메인 소켓]] — 씨앗. 파일 경로를 주소로 쓰는 같은 머신 안 통신. docker.sock (unexplored)
+- [[OverlayFS]] — 씨앗. 이미지 레이어(lower) 위에 쓰기 층(upper)을 겹쳐 merged로 보여 줌 (unexplored)
+- [[rootless 컨테이너]] — 씨앗. 일반 계정으로 띄우는 컨테이너. 계정마다 저장소가 따로 (unexplored)
+- [[conmon]] — 씨앗. Podman 컨테이너마다 붙는 감시 프로세스. 로그·종료 코드 (unexplored)
 
 ## 개발 외 (life)

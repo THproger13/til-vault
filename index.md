@@ -13,6 +13,9 @@
 - [[L4 포트 오픈 여부와 방화벽 상태]] — 포트 상태 3가지(열림·닫힘·필터됨)와 DROP·REJECT 구분, L4 리스너 포트와 대상 포트 두 구간 확인 (draft)
 - [[방화벽 확인 도구 ping·nc·tcpdump 차이]] — ping은 ICMP라 포트 방화벽을 못 봄, nc -zv는 TCP 포트 연결 결과, tcpdump는 한 지점에서 SYN 도착·응답 관찰. 공통 키워드 표 (draft)
 - [[Podman과 Docker 엔진 차이]] — compose 파일은 같고 엔진이 다름. dockerd 데몬 vs 데몬 없음(conmon), docker.sock → podman.sock 링크, 재부팅 재시작(4.9는 always만), 저장소·rootless·로그 드라이버 차이, RHEL 8 패키지 충돌 (draft)
+- [[KV 캐시]] — 처리한 토큰의 K·V를 저장해 재계산을 없애는 메모리. 크기가 요청 수·토큰 수에 비례. vLLM은 공용 블록, Ollama는 슬롯 × 컨텍스트로 잡음 (draft)
+- [[vLLM과 Ollama 동시성 차이]] — vLLM은 스텝마다 토큰 예산으로 배치를 다시 짜고 모자라면 preemption, Ollama는 슬롯(기본 1)과 큐. 작동 과정별 표 (draft)
+- [[vLLM과 Ollama 설정값과 튜닝]] — max-num-batched-tokens 등 설정값 의미와 증상별 조치, ITL·TTFT 맞바꿈, Ollama는 NUM_PARALLEL × CONTEXT_LENGTH 메모리 (draft)
 
 ### 씨앗 (연관 개념, 아직 질문 전)
 
@@ -52,5 +55,14 @@
 - [[OverlayFS]] — 씨앗. 이미지 레이어(lower) 위에 쓰기 층(upper)을 겹쳐 merged로 보여 줌 (unexplored)
 - [[rootless 컨테이너]] — 씨앗. 일반 계정으로 띄우는 컨테이너. 계정마다 저장소가 따로 (unexplored)
 - [[conmon]] — 씨앗. Podman 컨테이너마다 붙는 감시 프로세스. 로그·종료 코드 (unexplored)
+
+#### LLM 서빙
+- [[LLM 서빙]] — 씨앗. LLM을 서버로 띄워 여러 요청에 답하게 하는 일. vLLM·Ollama (unexplored)
+- [[어텐션]] — 씨앗. Query와 앞 토큰의 K·V로 다음 토큰을 예측할 표현을 계산하는 층 (unexplored)
+- [[prefill과 decode]] — 씨앗. 프롬프트를 한꺼번에 처리하는 단계와 토큰을 하나씩 만드는 단계 (unexplored)
+- [[PagedAttention]] — 씨앗. KV 캐시를 블록으로 나눠 저장하는 vLLM의 방식 (unexplored)
+- [[continuous batching]] — 씨앗. 배치를 스텝마다 다시 구성해 요청을 빼고 넣는 방식 (unexplored)
+- [[prefix caching]] — 씨앗. 같은 접두어의 KV 캐시 블록을 재사용하는 최적화 (unexplored)
+- [[llama.cpp 슬롯]] — 씨앗. llama.cpp 서버의 동시 처리 칸. KV 캐시를 칸 수 × 칸당 토큰으로 잡음 (unexplored)
 
 ## 개발 외 (life)

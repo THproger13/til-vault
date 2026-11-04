@@ -4,9 +4,9 @@ tags:
   - messaging
   - rabbitmq
   - check
-status: draft
+status: blog
 sensitivity: public
-post_format: none
+post_format: long
 cards: true
 prerequisite:
   - "[[메시지 큐]]"

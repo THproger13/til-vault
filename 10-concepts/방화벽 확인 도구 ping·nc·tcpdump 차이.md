@@ -3,9 +3,9 @@ title: 방화벽 확인 도구 ping·nc·tcpdump 차이
 tags:
   - network
   - check
-status: draft
+status: blog
 sensitivity: public
-post_format: none
+post_format: long
 cards: true
 prerequisite:
   - "[[L4 포트 오픈 여부와 방화벽 상태]]"

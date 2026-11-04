@@ -88,6 +88,7 @@
 ## 노트 상태 흐름
 `unexplored`(씨앗) → `draft`(답 노트, 빈칸 복습 중) → (`reviewed`: 말로 복습 통과, 선택) → `blog`(초안 대상) → `drafted`(초안 생성됨) → `published`
 - `blog`로 바꾸는 건 사람만 한다(Obsidian 속성 편집 또는 명령 "이 노트를 블로그 초안 대상으로"). Claude는 `blog`로 바꾸지 않고, 후보를 제안만 한다. `draft`·`reviewed` 어느 쪽에서든 바꿀 수 있다.
+- 묶음 노트(`note_type: hub`)를 `blog`로 바꾸면 그 주제의 하위 답 노트 전부를 긴 글 한 편으로 묶는다(씨앗은 제외, 상태 그대로). 묶음 노트와 들어간 답 노트가 모두 `drafted`가 된다.
 - `blog` 노트는 다음 저녁 작업이 `til-to-blog`로 `20-posts/drafts/`에 초안을 쓰고 `status: drafted`, `drafted_at`, `draft_path`를 남긴다. `sensitivity: internal`이면 초안을 만들지 않고 알림에 이유를 적는다.
 - `reviewed` 전환은 사람이 함께한 말로 복습 대화에서 통과했을 때만 한다(통과 = 오개념 0 + 인용 출처 확인). 미통과면 틀린 지점 카드 추가(노트당 최대 5장), `check` 유지.
 - 기록은 노트 맨 아래 "## 복습 기록"에 추가만 한다.

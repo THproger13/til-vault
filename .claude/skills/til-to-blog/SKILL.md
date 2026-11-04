@@ -6,7 +6,9 @@ description: 저녁 작업이 status blog 노트를 찾았을 때, 또는 "블�
 
 먼저 `style-guide.md`와 `20-posts/published/`의 최근 발행본 2편(없으면 style-guide의 예시)을 읽는다.
 
-입력: `status: blog`이고 `sensitivity: public`인 노트(묶음이면 여러 개). 사용자가 대화에서 노트를 직접 지정하면 `draft`·`reviewed`여도 쓰되, 먼저 그 노트를 `blog`로 바꿀지 물어본다. `post_format`이 `none`이면 `short`로 쓴다.
+입력: `status: blog`이고 `sensitivity: public`인 노트(묶음이면 여러 개).
+
+**묶음 노트(hub)로 쓰는 긴 글**: 묶음 노트의 "## 개요"를 글 도입과 요약의 뼈대로, "## 하위 개념 지도"를 전체 그림 도표로 쓴다. 하위 답 노트는 `prerequisite` 순서(선행 개념을 먼저)로 한 섹션씩 놓고, 각 섹션은 그 답 노트의 풀이·예제·도표·출처를 그대로 가져온다. 하위 노트끼리 겹치는 설명은 한 번만 쓰고 뒤 섹션에서 앞 섹션을 가리킨다. 씨앗은 "다음에 볼 개념" 목록에 이름과 한 줄 설명만 쓴다. `source_notes`에는 묶음 노트와 들어간 답 노트를 모두 적는다. 사용자가 대화에서 노트를 직접 지정하면 `draft`·`reviewed`여도 쓰되, 먼저 그 노트를 `blog`로 바꿀지 물어본다. `post_format`이 `none`이면 `short`로 쓴다.
 
 `templates/post.md` 순서를 지킨다.
 1. 검색 의도가 드러나는 제목 (문제·키워드 중심)

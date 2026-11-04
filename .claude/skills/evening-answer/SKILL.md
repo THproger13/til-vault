@@ -42,9 +42,13 @@ description: 평일 18:07·주말 14:07 예약 작업, 또는 "inbox 답 달아�
 - 해당 노트(`draft`)의 "## 확인 과제" 아래 `### 결과`에 날짜와 함께 옮기고, 맞는 체크박스를 체크한다. 결과가 답과 어긋나면 "## 답" 맨 아래에 `> 확인 결과와 다름: …`을 적는다.
 
 ## 7. 블로그 초안 (`status: blog` 노트)
-- `til-to-blog` 스킬 순서대로 노트마다 초안 하나를 `20-posts/drafts/`에 쓴다. 한 번에 최대 2개, 나머지는 다음 실행으로.
+- **묶음 노트 먼저 (주제별 긴 글)**: `note_type: hub`이고 `status: blog`인 묶음 노트가 있으면, 그 묶음 노트를 `part_of`로 둔 **답 노트 전부**(`note_type` 없음, `status`가 `draft`·`reviewed`·`blog`, `sensitivity: public`)를 재료로 긴 글 **한 편**을 쓴다. 씨앗(`note_type: seed`, `unexplored`)은 재료로 쓰지 않고 상태도 바꾸지 않는다(본문에서 "다음에 볼 개념"으로 이름만 소개해도 된다). `internal` 답 노트는 빼고 보고에 적는다. 답 노트가 하나도 없으면 초안을 만들지 않고 "하위 답 노트 없음: 묶음 노트명"을 보고한다. 묶음 노트의 `post_format`과 관계없이 긴 글로 쓴다.
+  - 이 글에 들어간 답 노트는 따로 초안을 만들지 않는다(`blog`로 바꿔 둔 것도).
+  - 끝나면 묶음 노트와 들어간 답 노트 모두 `status: drafted`, `drafted_at: 오늘`, 같은 `draft_path`로 바꾼다. 본문은 고치지 않는다.
+  - 묶음 글 한 편은 아래 "한 번에 최대 2개"에서 1개로 센다.
+- `til-to-blog` 스킬 순서대로 노트마다 초안 하나를 `20-posts/drafts/`에 쓴다. 한 번에 최대 2개(묶음 글 포함), 나머지는 다음 실행으로.
 - `sensitivity: internal`이면 초안을 만들지 않고 `status`도 그대로 두고 보고에 "internal이라 초안 안 만듦: 노트명"을 적는다.
-- 같은 `part_of` 부모를 가진 `blog` 노트가 3개 이상이고 모두 `post_format: long`이면 긴 글 하나로 묶는다. 그 외에는 노트 하나 = 글 하나, `post_format`이 `none`이면 `short`로 바꾼다.
+- (묶음 노트가 `blog`가 아닐 때) 같은 `part_of` 부모를 가진 `blog` 답 노트가 3개 이상이고 모두 `post_format: long`이면 긴 글 하나로 묶는다. 그 외에는 노트 하나 = 글 하나, `post_format`이 `none`이면 `short`로 바꾼다.
 - 초안을 쓴 노트는 `status: drafted`, `drafted_at: 오늘`, `draft_path: "20-posts/drafts/…"`로 바꾼다. 본문은 고치지 않는다.
 
 ## 6. 마무리

@@ -16,8 +16,8 @@ part_of:
 compared_with: []
 situation:
 review_load: 9
-review_count: 0
-next_review: 2026-11-03
+review_count: 2
+next_review: 2026-11-05
 captured_at: 2026-11-02
 answered_at: 2026-11-03
 reviewed_at:
@@ -25,6 +25,8 @@ drafted_at:
 draft_path:
 published_at:
 generated_at: 2026-11-03
+accuracy: 50
+last_reviewed: 2026-11-04
 ---
 
 ## 원본 메모
@@ -119,7 +121,7 @@ flowchart TB
 - [ ] `curl -s <서버 주소>/metrics | grep -E 'vllm:(num_requests_running|num_requests_waiting|kv_cache_usage_perc)'`: vLLM에 요청을 몰아넣으며 실행·대기 수와 KV 캐시 사용률이 어떻게 움직이는지 본다. (`curl` man NAME: "transfer a URL" · `-s` silent · `grep` man NAME: "print lines that match patterns" · `-E` extended regexp. 지표: [Metrics](https://docs.vllm.ai/en/stable/design/metrics/))
 
 ## 복습 카드
-- vLLM 스케줄러는 매 스텝 ==max_num_batched_tokens== 예산 안에서 실행 중·대기 요청에 계산할 토큰을 나눠 준다.
-- Ollama에서 모델 하나가 동시에 처리하는 요청 수는 `OLLAMA_NUM_PARALLEL`로 정하고, 기본값은 ==1==이다.
+- vLLM 스케줄러는 매 스텝 ==max_num_batched_tokens== 예산 안에서 실행 중·대기 요청에 계산할 토큰을 나눠 준다. <!--til:2026-11-05,1,1,0-->
+- Ollama에서 모델 하나가 동시에 처리하는 요청 수는 `OLLAMA_NUM_PARALLEL`로 정하고, 기본값은 ==1==이다. <!--til:2026-11-07,3,1,1-->
 
 ## 복습 기록

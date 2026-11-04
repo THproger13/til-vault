@@ -15,8 +15,8 @@ part_of:
 compared_with: []
 situation:
 review_load: 7
-review_count: 0
-next_review: 2026-11-03
+review_count: 2
+next_review: 2026-11-05
 captured_at: 2026-11-02
 answered_at: 2026-11-03
 reviewed_at:
@@ -24,6 +24,8 @@ drafted_at:
 draft_path:
 published_at:
 generated_at: 2026-11-03
+accuracy: 50
+last_reviewed: 2026-11-04
 ---
 
 ## 원본 메모
@@ -106,7 +108,7 @@ sequenceDiagram
 - [ ] `curl -s <서버 주소>/metrics | grep kv_cache_usage_perc`: vLLM에서 요청 전후로 사용 중인 KV 캐시 블록 비율(0~1)을 비교한다. (`curl` man NAME: "transfer a URL" · `-s` silent(진행 표시 숨김) · `grep` man NAME: "print lines that match patterns". 지표: [Metrics](https://docs.vllm.ai/en/stable/design/metrics/))
 
 ## 복습 카드
-- KV 캐시는 이미 처리한 토큰의 ==Key와 Value|K와 V|키와 값==를 저장해, 다음 토큰을 만들 때 마지막 토큰의 것만 새로 계산하게 한다.
-- KV 캐시를 쓰면 토큰당 연산량은 낮게 유지되는 대신 메모리가 토큰 수에 ==선형으로|비례해서== 늘어난다.
+- KV 캐시는 이미 처리한 토큰의 ==Key와 Value|K와 V|키와 값==를 저장해, 다음 토큰을 만들 때 마지막 토큰의 것만 새로 계산하게 한다. <!--til:2026-11-07,3,1,1-->
+- KV 캐시를 쓰면 토큰당 연산량은 낮게 유지되는 대신 메모리가 토큰 수에 ==선형으로|비례해서== 늘어난다. <!--til:2026-11-05,1,1,0-->
 
 ## 복습 기록

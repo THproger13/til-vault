@@ -21,10 +21,10 @@ captured_at: 2026-10-23
 answered_at: 2026-10-25
 published_at:
 generated_at: 2026-10-23
-review_count: 5
-next_review: 2026-11-02
+review_count: 10
+next_review: 2026-11-05
 accuracy: 60
-last_reviewed: 2026-11-01
+last_reviewed: 2026-11-04
 ---
 
 ## 원본 메모
@@ -121,11 +121,11 @@ flowchart LR
 - [ ] 내 Spring 설정에서 `default-requeue-rejected`와 `acknowledge-mode`를 따로 지정했는지 (안 했으면 AUTO + requeue=true)
 
 ## 복습 카드
-- DLQ는 ==Dead Letter Queue==의 약자다. <!--til:2026-11-04,3,1,1-->
-- DLQ에는 ==처리되지 않은 메시지|처리 안 된 메시지|처리 못 한 메시지==가 모인다. <!--til:2026-11-04,3,1,1-->
-- 수동 ack 모드에서 ack 전에 연결이 끊긴 메시지는 ==큐로 자동 재전달|큐로 재전달|재전달==된다. <!--til:2026-11-02,1,1,0-->
-- DLX로 지정한 교환기가 없으면 dead-letter 대상 메시지는 오류 없이 조용히 ==버려진다|버려짐|폐기된다==. <!--til:2026-11-04,3,1,1-->
-- RabbitMQ 4.0부터 quorum 큐의 기본 ==delivery-limit==은 ==20==회다. <!--til:2026-11-02,1,1,0-->
+- DLQ는 ==Dead Letter Queue==의 약자다. <!--til:2026-11-11,7,2,2-->
+- DLQ에는 ==처리되지 않은 메시지|처리 안 된 메시지|처리 못 한 메시지==가 모인다. <!--til:2026-11-11,7,2,2-->
+- 수동 ack 모드에서 ack 전에 연결이 끊긴 메시지는 ==큐로 자동 재전달|큐로 재전달|재전달==된다. <!--til:2026-11-05,1,2,0-->
+- DLX로 지정한 교환기가 없으면 dead-letter 대상 메시지는 오류 없이 조용히 ==버려진다|버려짐|폐기된다==. <!--til:2026-11-11,7,2,2-->
+- RabbitMQ 4.0부터 quorum 큐의 기본 ==delivery-limit==은 ==20==회다. <!--til:2026-11-05,1,2,0-->
 
 ## 복습 기록
 - 2026-10-23 (Claude 말로 복습) Q: 메시지가 DLQ로 가는 경우는?

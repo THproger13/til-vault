@@ -16,8 +16,8 @@ part_of:
 compared_with: []
 situation: 서버에서 Docker 엔진 대신 podman + docker compose 플러그인으로 앱 컨테이너를 배포함. 컨테이너 저장소 폴더(/var/lib/containers/storage)를 살펴봄
 review_load: 10
-review_count: 0
-next_review: 2026-11-02
+review_count: 3
+next_review: 2026-11-05
 captured_at: 2026-11-02
 answered_at: 2026-11-02
 reviewed_at:
@@ -25,6 +25,8 @@ drafted_at:
 draft_path:
 published_at:
 generated_at: 2026-11-02
+accuracy: 0
+last_reviewed: 2026-11-04
 ---
 
 ## 원본 메모
@@ -167,8 +169,8 @@ flowchart LR
 - [ ] `systemctl is-enabled podman.socket podman-restart.service`로 소켓과 재부팅 재시작 유닛이 켜져 있는지 본다 (`is-enabled` 유닛 파일이 enable 상태인지 확인) ([systemctl(1)](https://www.freedesktop.org/software/systemd/man/latest/systemctl.html))
 
 ## 복습 카드
-- Docker는 늘 떠 있는 데몬 ==dockerd==가 컨테이너를 맡고, Podman은 데몬 없이 컨테이너마다 ==conmon==이 붙는다.
-- docker compose를 Podman에 붙일 때는 `/var/run/docker.sock`을 Podman의 ==Docker 호환 API 소켓|podman.sock|podman 소켓==으로 링크한다.
-- Podman 4.9의 `podman-restart.service`는 재부팅 뒤 재시작 정책이 ==always==인 컨테이너만 다시 띄운다.
+- Docker는 늘 떠 있는 데몬 ==dockerd==가 컨테이너를 맡고, Podman은 데몬 없이 컨테이너마다 ==conmon==이 붙는다. <!--til:2026-11-05,1,1,0-->
+- docker compose를 Podman에 붙일 때는 `/var/run/docker.sock`을 Podman의 ==Docker 호환 API 소켓|podman.sock|podman 소켓==으로 링크한다. <!--til:2026-11-05,1,1,0-->
+- Podman 4.9의 `podman-restart.service`는 재부팅 뒤 재시작 정책이 ==always==인 컨테이너만 다시 띄운다. <!--til:2026-11-05,1,1,0-->
 
 ## 복습 기록

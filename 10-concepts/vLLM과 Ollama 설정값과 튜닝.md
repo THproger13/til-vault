@@ -15,7 +15,7 @@ part_of:
 compared_with: []
 situation:
 review_load: 10
-review_count: 2
+review_count: 3
 next_review: 2026-11-05
 captured_at: 2026-11-02
 answered_at: 2026-11-03
@@ -25,7 +25,7 @@ draft_path:
 published_at:
 generated_at: 2026-11-03
 accuracy: 0
-last_reviewed: 2026-11-04
+last_reviewed: 2026-11-05
 ---
 
 ## 원본 메모
@@ -142,7 +142,7 @@ flowchart TD
 - [ ] vLLM을 띄운 뒤 부하를 주며 로그에서 `preempted`를 찾고, `--max-num-batched-tokens`를 2048과 8192로 바꿔 `vllm:time_to_first_token_seconds`와 `vllm:inter_token_latency_seconds`를 비교한다. (`--max-num-batched-tokens`: 스텝당 최대 토큰 수)
 
 ## 복습 카드
-- vLLM의 `max_num_batched_tokens`를 작게 잡으면 ==ITL|토큰 간 지연==이 좋아지고, 크게 잡으면 ==TTFT|첫 토큰 시간==이 좋아진다. <!--til:2026-11-05,1,1,0-->
+- vLLM의 `max_num_batched_tokens`를 작게 잡으면 ==ITL|토큰 간 지연==이 좋아지고, 크게 잡으면 ==TTFT|첫 토큰 시간==이 좋아진다. <!--til:2026-11-06,1,2,0-->
 - Ollama에 필요한 메모리는 ==OLLAMA_NUM_PARALLEL== × `OLLAMA_CONTEXT_LENGTH`에 맞춰 늘어난다. <!--til:2026-11-05,1,1,0-->
 
 ## 복습 기록

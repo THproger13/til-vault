@@ -3,7 +3,9 @@ title: 방화벽 확인 도구 ping·nc·tcpdump 차이
 tags:
   - network
   - check
-status: blog
+status: drafted
+drafted_at: 2026-11-05
+draft_path: "20-posts/drafts/2026-11-05-port-firewall-vs-service.md"
 sensitivity: public
 post_format: long
 cards: true

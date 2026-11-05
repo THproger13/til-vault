@@ -4,7 +4,9 @@ tags:
   - messaging
   - rabbitmq
   - check
-status: blog
+status: drafted
+drafted_at: 2026-11-05
+draft_path: "20-posts/drafts/2026-11-05-rabbitmq-dlq-operations.md"
 sensitivity: public
 post_format: long
 cards: true

@@ -12,6 +12,7 @@
 - [[네트워크와 방화벽]] — 묶음 노트(hub). 서비스 문제와 방화벽 문제를 가르는 개요, 하위 개념 지도 (draft)
 - [[L4 포트 오픈 여부와 방화벽 상태]] — 포트 상태 3가지(열림·닫힘·필터됨)와 DROP·REJECT 구분, L4 리스너 포트와 대상 포트 두 구간 확인 (draft)
 - [[방화벽 확인 도구 ping·nc·tcpdump 차이]] — ping은 ICMP라 포트 방화벽을 못 봄, nc -zv는 TCP 포트 연결 결과, tcpdump는 한 지점에서 SYN 도착·응답 관찰. 공통 키워드 표 (draft)
+- [[프록시 뒤에서 클라이언트 실 IP 전달]] — 프록시마다 TCP 출발지가 바뀌므로 원래 IP는 XFF로 넘기고, 신뢰 프록시가 덧붙인 값만 읽음. 맨 앞 값 위조, nginx realip 모듈(기본 빌드 아님) (draft)
 - [[Podman과 Docker 엔진 차이]] — compose 파일은 같고 엔진이 다름. dockerd 데몬 vs 데몬 없음(conmon), docker.sock → podman.sock 링크, 재부팅 재시작(4.9는 always만), 저장소·rootless·로그 드라이버 차이, RHEL 8 패키지 충돌 (draft)
 - [[KV 캐시]] — 처리한 토큰의 K·V를 저장해 재계산을 없애는 메모리. 크기가 요청 수·토큰 수에 비례. vLLM은 공용 블록, Ollama는 슬롯 × 컨텍스트로 잡음 (draft)
 - [[vLLM과 Ollama 동시성 차이]] — vLLM은 스텝마다 토큰 예산으로 배치를 다시 짜고 모자라면 preemption, Ollama는 슬롯(기본 1)과 큐. 작동 과정별 표 (draft)
@@ -45,6 +46,8 @@
 - [[SNAT와 DSR]] — 씨앗. 응답이 L4 장비를 거쳐 오는지(SNAT) 서버에서 바로 가는지(DSR) (unexplored)
 - [[ICMP]] — 씨앗. IP 위의 오류·제어 메시지. ping과 도달 불가 오류, 포트 없음 (unexplored)
 - [[상태 기반 방화벽]] — 씨앗. 연결 상태를 추적해 응답 패킷을 통과시키는 방화벽 (unexplored)
+- [[nginx realip 모듈]] — 씨앗. 믿는 주소에서 온 요청이면 헤더 값으로 nginx가 보는 클라이언트 주소를 바꾸는 모듈 (unexplored)
+- [[PROXY protocol]] — 씨앗. 프록시가 원래 클라이언트 주소를 함께 알리는 방식 (unexplored)
 - [[pcap 필터 표현식]] — 씨앗. tcpdump가 볼 패킷을 고르는 문법 (unexplored)
 
 #### 컨테이너

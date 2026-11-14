@@ -64,7 +64,7 @@
 - 노트를 새로 만들거나 이름이 정해지면 `index.md`에 한 줄 요약을 추가한다.
 
 ## 예약 작업의 쓰기 범위
-- 허용: 새 파일 생성, `unexplored`·`draft` 노트 수정, `blog` 노트의 초안 생성과 `status: drafted` 전환, `90-daily/`·`dashboards/`·`style-guide.md`·`index.md` 갱신, `boss`·`check` 태그, `archive/` 이동
+- 허용: 새 파일 생성, `unexplored`·`draft` 노트 수정, `40-demand/`의 `candidate` 아이디어 노트 수정, `blog` 노트의 초안 생성과 `status: drafted` 전환, `90-daily/`·`dashboards/`·`style-guide.md`·`index.md` 갱신, `boss`·`check` 태그, `archive/` 이동
 - `reviewed`·`blog`·`drafted`·`published` 노트는 본문을 고치지 않고, 맨 끝 "## 보강 제안" 섹션에만 쓴다.
 - 커밋 메시지는 `[claude]`로 시작한다. 충돌이 나면 쓰지 않고 주간 리포트에 남긴다.
 
@@ -83,7 +83,7 @@
 - 평일 18:07 · 주말 14:07: `evening-answer`가 inbox 질문에 출처 있는 답 노트(`draft` + `check`)를 만들고, 이어서 `status: blog` 노트의 블로그 초안을 만든 뒤 알림을 보낸다.
 - 아무 때나: Obsidian에서 빈칸 복습(`til-review`). 원할 때만 대화에서 `voice-review`(말로 복습).
 - 토요일 14:07 (주말 답변 작업의 토요일 회차): 답변·초안 뒤에 `inbox-organize`가 남은 메모 처리, 묶음 노트(hub) 판단, 보관만 한다.
-- 일요일 20:41: 이번 주 리포트와 다음 주 퀘스트·글 후보를 한 번에 만든다. (2026-11-04~, 예약 작업 구성: `docs/볼트 폴더 운영 가이드.md` 맨 아래)
+- 일요일 20:41: 이번 주 리포트와 다음 주 퀘스트·글 후보를 한 번에 만들고, 이어서 `demand-research`로 주간 수요 리서치를 한다. (2026-11-04~, 예약 작업 구성: `docs/볼트 폴더 운영 가이드.md` 맨 아래)
 
 ## 노트 상태 흐름
 `unexplored`(씨앗) → `draft`(답 노트, 빈칸 복습 중) → (`reviewed`: 말로 복습 통과, 선택) → `blog`(초안 대상) → `drafted`(초안 생성됨) → `published`
@@ -95,3 +95,10 @@
 
 ## 개발 외 주제
 - `life/` 폴더에만 쓴다. 노트에 `channel: life` 속성. 개발 지도와 섞지 않는다.
+
+## 수요 리서치 (사이드 프로덕트)
+- `40-demand/`에만 쓴다. 학습 노트·개념 지도와 섞지 않고, `index.md`에 넣지 않는다. 블로그 글감(`30-ideas/`)과도 별개다.
+- 기준 파일: `config/demand-focus.md`(관심 영역·내 강점·제외 조건). 사람이 고친다.
+- 아이디어 노트(`templates/demand-idea.md`) 상태: `candidate` → `testing` → `building` 또는 `killed`. 상태는 사람만 바꾼다. `killed`도 지우지 않는다(같은 아이디어가 다시 올라오지 않게).
+- Claude는 `candidate` 노트의 증거·점수만 고친다. `testing`·`building`·`killed` 노트는 "## 보강 제안"에만 쓴다.
+- 증거는 출처 링크 필수. 남의 글은 인용하지 않고 한 줄로 요약한다.

@@ -5,11 +5,11 @@ source_notes: ["[[메시지 큐]]", "[[DLQ]]"]
 post_format: long
 created_at: 2026-11-16
 published_at:
-version_info: RabbitMQ 4.0 quorum 큐 기준, Spring AMQP 문서 기준
+version_info: RabbitMQ 4.0, Spring AMQP 4.0 (공식 문서 기준), Spring Boot 버전 확인 필요
 ---
 
 > 비교용 재작성본: `2026-11-05-rabbitmq-dlq-operations.md`와 사실·코드·출처는 같고 문장만 새 말투 규칙으로 다시 썼다. 마음에 드는 쪽 하나만 남긴다.
-> 발행 전 확인: "직접 해본 결과"가 비어 있음(`[직접 작성]`). "문제 상황"의 첫 문단은 10월 23일 말로 복습 때 내 대답을 바탕으로 썼으니 실제 생각과 맞는지 본다.
+> 발행 전 확인: "직접 해본 결과"가 비어 있음(`[직접 작성]`). 예제 기준 버전은 근거 문서의 버전이다. 실제로 쓰는 Spring Boot·Spring AMQP·RabbitMQ 버전이 다르면 고친다(Spring Boot 버전은 확인 못 해 비워 둠). "문제 상황"의 첫 문단은 10월 23일 말로 복습 때 내 대답을 바탕으로 썼으니 실제 생각과 맞는지 본다.
 
 # RabbitMQ DLQ란? 메시지가 가는 4가지 경우와 운영에서 터지는 시나리오
 
@@ -25,12 +25,17 @@ DLQ를 처음 접했을 때는 "처리가 안 된 메시지가 모이는 큐" �
 
 ## 원리
 
-### 1. DLQ는 특별한 큐가 아니다
-먼저 메시지 큐부터 짚고 가자. RabbitMQ의 큐는 메시지를 순서대로 쌓아 두었다가 먼저 들어온 것부터 소비자에게 전달하는 저장소다 ([RabbitMQ: Queues](https://www.rabbitmq.com/docs/queues)). DLQ도 이 점에서는 다른 큐와 똑같은 일반 큐인데, 달라지는 것은 메시지가 들어오는 경로다.
+### 1. DLQ는 왜 필요할까?
+먼저 메시지 큐부터 짚고 가자. RabbitMQ의 큐는 메시지를 순서대로 쌓아 두었다가 먼저 들어온 것부터 소비자에게 전달하는 저장소다 ([RabbitMQ: Queues](https://www.rabbitmq.com/docs/queues)). 대부분의 메시지는 이렇게 전달되고 처리되면 끝나지만, 문제는 처리할 수 없는 메시지가 섞여 들어왔을 때다. 예를 들어 데이터 형식이 잘못돼서 소비자가 몇 번을 받아도 실패하는 메시지가 있다고 하자.
+
+이때 큐가 이 메시지에 대해 할 수 있는 일은 원래 두 가지뿐이다. 하나는 큐에 다시 넣는 것인데, 어차피 또 실패할 메시지라서 큐와 소비자 사이를 끝없이 오가며 네트워크와 CPU만 쓰게 된다. 다른 하나는 버리는 것인데, 그러면 무엇이 왜 실패했는지 확인할 방법이 사라진다 ([RabbitMQ: Consumer Acknowledgements](https://www.rabbitmq.com/docs/confirms)). 계속 돌리자니 낭비이고 버리자니 유실인 셈이다. 그래서 이런 메시지를 원래 큐에서는 빼내되 버리지는 않고 따로 모아 두는 세 번째 선택지가 필요해졌고, 그 역할을 하는 것이 DLQ다.
+
+### 2. DLQ는 특별한 큐가 아니다
+그렇다면 DLQ는 어떻게 만들어질까? 사실 DLQ는 다른 큐와 똑같은 일반 큐이고, 달라지는 것은 메시지가 들어오는 경로뿐이다.
 
 큐에는 DLX라는 교환기를 지정해 둘 수 있다. 이렇게 해 두면 그 큐에서 "죽은" 메시지가 버려지는 대신 DLX로 다시 발행되고, DLX에 바인딩해 둔 큐가 그 메시지를 받는다 ([RabbitMQ: Dead Letter Exchanges](https://rabbitmq.com/docs/dlx)). 이 마지막 큐를 DLQ라고 부르는 것이다. 따라서 DLQ를 쓴다는 말은 사실 "DLX를 지정하고 거기에 큐를 하나 묶어 둔다"는 뜻이라고 생각하면 된다.
 
-### 2. 메시지는 언제 DLQ로 갈까?
+### 3. 메시지는 언제 DLQ로 갈까?
 이제 처음 질문으로 돌아가서, 어떤 메시지가 죽은 메시지로 취급되는지 보자. RabbitMQ 문서 기준으로는 다음 네 가지 경우다.
 
 1. 소비자가 메시지를 거절하면서(`basic.reject` 또는 `basic.nack`) 다시 큐에 넣지 말라고(`requeue=false`) 했을 때
@@ -53,7 +58,7 @@ flowchart LR
   C -.->|"ack 전에 연결 끊김<br/>(수동 ack)"| Q
 ```
 
-### 3. 그럼 소비자가 죽었을 때는 누가 메시지를 지킬까?
+### 4. 그럼 소비자가 죽었을 때는 누가 메시지를 지킬까?
 위 네 가지 경우를 다시 보면 "소비자가 처리 도중에 죽었을 때"는 어디에도 없다. 내가 처음에 잘못 알고 있던 부분이 바로 여기다. 이 경우를 책임지는 것은 ack(acknowledgement), 즉 소비자가 "처리를 끝냈다"고 브로커에 알려 주는 확인 방식이다.
 
 ack에는 자동과 수동이 있다. 자동 ack는 브로커가 메시지를 보내자마자 성공으로 처리하기 때문에, 소비자가 받은 직후에 죽으면 메시지는 그대로 사라지고 DLQ로도 가지 않는다. 반면 수동 ack에서는 소비자가 ack를 보내기 전에 연결이 끊기면 브로커가 그 메시지를 큐로 되돌려 다시 전달한다 ([RabbitMQ: Consumer Acknowledgements](https://www.rabbitmq.com/docs/confirms)). 따라서 소비자 장애에 대비하려면 DLQ가 아니라 수동 ack를 써야 한다. 위 그림에서 Consumer에서 Queue로 돌아가는 점선이 이 경로다.
@@ -82,6 +87,8 @@ DLX를 지정하는 방법도 하나 알아 두자. 큐를 만들 때 인자(`x-
 ## Spring AMQP에서는 기본값이 무한 재전달이다
 위 표의 세 번째 시나리오, 즉 처리하지 못하는 메시지가 계속 큐로 돌아가는 상황은 남의 이야기가 아니다. Spring에서 `@RabbitListener`를 아무 설정 없이 쓰면 이것이 기본 동작이기 때문이다. 다음 코드를 보자.
 
+> 예제 기준: Spring AMQP 4.0(`@RabbitListener`), RabbitMQ 4.0 · Spring Boot 버전 확인 필요
+
 ```java
 // application.yml — 예외 난 메시지를 큐로 되돌리지 않음 (DLX가 있으면 DLQ로, 없으면 버려짐)
 // spring.rabbitmq.listener.simple.default-requeue-rejected: false
@@ -104,7 +111,11 @@ public void handle(OrderMessage msg) {
 막는 방법은 두 가지다. 설정에서 `default-requeue-rejected`를 `false`로 바꾸거나, 위 코드처럼 다시 받을 필요가 없는 메시지에 대해서만 `AmqpRejectAndDontRequeueException`을 던지면 된다 ([Spring Boot: AMQP](https://docs.spring.io/spring-boot/reference/messaging/amqp.html)). 어느 쪽이든 그 메시지는 `requeue=false`로 거절되므로 DLX가 있으면 DLQ로 가고 없으면 버려진다 ([Spring AMQP: Exception Handling](https://docs.spring.io/spring-amqp/reference/amqp/exception-handling.html)). 결국 이 설정은 DLX 설정과 짝으로 해 줘야 의미가 있다.
 
 ## 직접 해본 결과
-[직접 작성] 아래를 내 환경에서 실행해 보고 결과를 회사 정보 없이 적는다. `rabbitmqctl`은 RabbitMQ 노드를 관리하는 명령줄 도구이고, `list_queues` 뒤에 붙는 단어들은 옵션이 아니라 보여 줄 열 이름이다 ([rabbitmqctl(8)](https://www.rabbitmq.com/docs/man/rabbitmqctl.8)).
+[직접 작성] 아래를 내 환경에서 실행해 보고 결과를 회사 정보 없이 적는다.
+
+> 예제 기준: RabbitMQ 4.0의 `rabbitmqctl`
+
+ `rabbitmqctl`은 RabbitMQ 노드를 관리하는 명령줄 도구이고, `list_queues` 뒤에 붙는 단어들은 옵션이 아니라 보여 줄 열 이름이다 ([rabbitmqctl(8)](https://www.rabbitmq.com/docs/man/rabbitmqctl.8)).
 - `rabbitmqctl version`: 4.0 이상인지 (이상이면 quorum 큐 재전달 한도 20이 적용된다)
 - `rabbitmqctl list_policies`: `dead-letter-exchange`를 지정한 정책이 있는지
 - `rabbitmqctl list_queues name type messages policy`: quorum 큐인데 DLX 정책이 없는 큐가 있는지 (열은 차례로 큐 이름, 큐 종류, 쌓인 메시지 수, 적용된 정책)

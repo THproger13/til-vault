@@ -135,3 +135,9 @@ flowchart LR
   - 교정: 소비자가 죽었을 때 메시지를 지키는 건 DLQ가 아니라 수동 ack다. 수동 ack에서 ack 안 된 메시지는 채널·연결이 끊기면 큐로 자동 재전달되고, 자동 ack면 그냥 유실된다(DLQ로도 안 감). ([Consumer Acknowledgements](https://www.rabbitmq.com/docs/confirms))
   - DLQ로 가는 경우는 4가지: ① 소비자가 reject/nack(requeue=false) ② 메시지 TTL 만료 ③ 큐 길이 한도 초과 ④ quorum 큐의 재전달 횟수 한도 초과. ([Dead Letter Exchanges](https://www.rabbitmq.com/docs/dlx))
   - 결과: 오개념 1개 → `check` 유지, 다음 복습에서 다시 묻기
+
+## 보강 제안
+- 2026-11-16: 블로그 재작성본(`20-posts/drafts/2026-11-16-rabbitmq-dlq-operations-rewrite.md`)에 아래를 추가했다. 이 노트 본문에는 아직 없다.
+  - `### 왜 필요한가`: 처리할 수 없는 메시지는 다시 넣으면 끝없이 돌고 버리면 유실되므로, 따로 모아 둘 곳이 필요하다. ([Consumer Acknowledgements](https://www.rabbitmq.com/docs/confirms))
+  - DLX·DLQ 선언 예제(주문 예시 `order.queue`·`order.dlx`·`order.dlq`): `QueueBuilder.durable("order.queue").deadLetterExchange("order.dlx")` + `FanoutExchange` + 바인딩. ([Spring AMQP: QueueBuilder](https://docs.spring.io/spring-amqp/api/org/springframework/amqp/core/QueueBuilder.html))
+  - 정책 지정 명령 `rabbitmqctl set_policy … --apply-to queues`: 문서에서 직접 확인 필요. ([DLX](https://rabbitmq.com/docs/dlx))

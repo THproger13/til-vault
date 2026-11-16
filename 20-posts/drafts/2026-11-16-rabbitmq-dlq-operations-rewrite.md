@@ -164,10 +164,10 @@ public void handle(OrderMessage msg) {
 @Bean
 Queue orderQueue() {
     return QueueBuilder.durable("order.queue")
-            .quorum()                            // ← quorum 큐로 선언
-            .deliveryLimit(4)                    // ← 재전달 한도(delivery-limit): 기본 20 대신 4
-            .deadLetterExchange("order.dlx")     // ← DLX
-            .deadLetterRoutingKey("order.dead")  // ← dead-letter 라우팅 키: 죽은 메시지에 새로 붙일 키
+            .quorum()                              // ← quorum 큐로 선언
+            .withArgument("x-delivery-limit", 4)   // ← 재전달 한도(delivery-limit): 기본 20 대신 4
+            .deadLetterExchange("order.dlx")       // ← DLX
+            .deadLetterRoutingKey("order.dead")    // ← dead-letter 라우팅 키: 죽은 메시지에 새로 붙일 키
             .build();
 }
 @Bean
@@ -184,7 +184,7 @@ Binding dlqBinding() {
 }
 ```
 
-이 코드에서 재전달 한도는 `deliveryLimit(4)` 줄이다. 이 값은 quorum 큐에만 적용되므로 바로 위의 `quorum()`과 짝으로 써야 한다 ([Spring AMQP: QueueBuilder](https://docs.spring.io/spring-amqp/api/org/springframework/amqp/core/QueueBuilder.html)). 한도를 작게 잡으면 처리하지 못하는 주문 메시지가 `order.queue`와 소비자 사이를 그만큼 덜 오가고, 더 빨리 `order.dlx`를 거쳐 `order.dlq`로 넘어간다 ([RabbitMQ: Quorum Queues](https://www.rabbitmq.com/docs/4.0/quorum-queues)).
+이 코드에서 재전달 한도는 `withArgument("x-delivery-limit", 4)` 줄이다. `withArgument`는 큐 인자 이름과 값을 직접 넣는 메서드이고, 여기서는 재전달 한도 인자인 `x-delivery-limit`를 4로 넣었다. 이 인자는 quorum 큐에만 적용되므로 바로 위의 `quorum()`과 짝으로 써야 한다 ([Spring AMQP: QueueBuilder](https://docs.spring.io/spring-amqp/api/org/springframework/amqp/core/QueueBuilder.html)). 참고로 `QueueBuilder`에는 같은 일을 하는 `deliveryLimit(4)` 메서드도 있는데, 소스를 보면 이 메서드도 안에서 `withArgument("x-delivery-limit", limit)`를 부를 뿐이라 어느 쪽으로 써도 브로커에 들어가는 인자는 같다 ([Spring AMQP 3.2.12 소스: QueueBuilder](https://github.com/spring-projects/spring-amqp/blob/v3.2.12/spring-amqp/src/main/java/org/springframework/amqp/core/QueueBuilder.java)). 한도를 작게 잡으면 처리하지 못하는 주문 메시지가 `order.queue`와 소비자 사이를 그만큼 덜 오가고, 더 빨리 `order.dlx`를 거쳐 `order.dlq`로 넘어간다 ([RabbitMQ: Quorum Queues](https://www.rabbitmq.com/docs/4.0/quorum-queues)).
 
 다음으로 볼 것은 DLX를 direct 교환기로 바꾼 부분이다. direct 교환기(direct exchange)는 메시지의 라우팅 키와 바인딩 키가 정확히 같은 큐에만 메시지를 넘겨주는 교환기다. 그래서 DLX를 direct로 만들면 죽은 메시지가 어떤 라우팅 키를 달고 DLX에 도착하는지가 중요해진다. RabbitMQ는 큐에 dead-letter 라우팅 키(`x-dead-letter-routing-key`)가 지정돼 있으면 그 키를 쓰고, 없으면 메시지가 처음 발행될 때 달고 있던 라우팅 키를 그대로 쓴다 ([RabbitMQ: Dead Letter Exchanges](https://rabbitmq.com/docs/dlx)). 예를 들어 주문 서비스가 `order.created`라는 키로 보낸 메시지가 죽었는데 `deadLetterRoutingKey` 줄을 빼먹었다면, 메시지는 `order.created`를 단 채로 `order.dlx`에 도착한다. 그런데 `order.dlq`는 `order.dead`로 묶여 있으므로 받아 줄 큐가 없고, 앞에서 본 바인딩 누락과 똑같이 오류 없이 사라진다. 따라서 direct DLX를 쓸 때는 `deadLetterRoutingKey`와 바인딩의 `with(...)`에 같은 키를 넣었는지 꼭 맞춰 보자.
 
@@ -304,7 +304,7 @@ DLX와 DLQ를 제대로 만들었어도 아무도 `order.dlq`를 보지 않으�
 - [rabbitmqctl(8)](https://www.rabbitmq.com/docs/man/rabbitmqctl.8)
 - [Spring AMQP: AcknowledgeMode](https://docs.spring.io/spring-amqp/api/org/springframework/amqp/core/AcknowledgeMode.html) · [Container Attributes (3.2)](https://docs.spring.io/spring-amqp/reference/3.2/amqp/containerAttributes.html) · [Exception Handling (3.2)](https://docs.spring.io/spring-amqp/reference/3.2/amqp/exception-handling.html)
 - [Spring AMQP 3.2: Annotated Endpoint Method Signature](https://docs.spring.io/spring-amqp/reference/3.2/amqp/receiving-messages/async-annotation-driven/enable-signature.html) · [RabbitTemplate (Correlated Publisher Confirms and Returns)](https://docs.spring.io/spring-amqp/reference/3.2/amqp/template.html)
-- [Spring AMQP 3.2.12 소스: BlockingQueueConsumer](https://github.com/spring-projects/spring-amqp/blob/v3.2.12/spring-rabbit/src/main/java/org/springframework/amqp/rabbit/listener/BlockingQueueConsumer.java)
+- [Spring AMQP 3.2.12 소스: BlockingQueueConsumer](https://github.com/spring-projects/spring-amqp/blob/v3.2.12/spring-rabbit/src/main/java/org/springframework/amqp/rabbit/listener/BlockingQueueConsumer.java) · [QueueBuilder](https://github.com/spring-projects/spring-amqp/blob/v3.2.12/spring-amqp/src/main/java/org/springframework/amqp/core/QueueBuilder.java)
 - [Spring Boot: AMQP](https://docs.spring.io/spring-boot/reference/messaging/amqp.html)
 
 ---

@@ -235,7 +235,7 @@ public void handle(OrderMessage msg, Channel channel,
 // spring.rabbitmq.publisher-returns: true             ← 돌려받은 메시지를 받을 수 있게
 // spring.rabbitmq.template.mandatory: true            ← mandatory 플래그 켜기
 
-CorrelationData cd = new CorrelationData(msg.id());  // 이 메시지의 확인 응답을 받을 그릇
+CorrelationData cd = new CorrelationData(msg.id());  // 이 메시지의 확인 응답을 받을 객체
 rabbitTemplate.convertAndSend("order.exchange", "order.created", msg, cd);
 CorrelationData.Confirm confirm = cd.getFuture().get(10, TimeUnit.SECONDS);
 if (!confirm.isAck()) throw new IllegalStateException("브로커가 받지 못함");      // ← nack

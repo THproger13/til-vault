@@ -5,11 +5,12 @@ source_notes: ["[[메시지 큐]]", "[[DLQ]]"]
 post_format: long
 created_at: 2026-11-16
 published_at:
-version_info: RabbitMQ 4.0, Spring AMQP 4.0 (공식 문서 기준), Spring Boot 버전 확인 필요
+version_info: RabbitMQ 4.1.8, Spring Boot 3.5.16 (Spring AMQP 3.2.12) — 실제 운영 환경 기준. 버전마다 다른 동작은 본문에 4.0·4.1·4.3 문서 기준을 따로 밝힘
 ---
 
 > 비교용 재작성본: `2026-11-05-rabbitmq-dlq-operations.md`와 사실·코드·출처는 같고 문장만 새 말투 규칙으로 다시 썼다. 마음에 드는 쪽 하나만 남긴다.
-> 발행 전 확인: "직접 해본 결과"가 비어 있음(`[직접 작성]`). `rabbitmqctl set_policy` 명령은 문서를 직접 열어 확인하지 못했으니 [DLX 문서](https://rabbitmq.com/docs/dlx)의 예시와 맞는지 본다. 예제 기준 버전은 근거 문서의 버전이다. 실제로 쓰는 Spring Boot·Spring AMQP·RabbitMQ 버전이 다르면 고친다(Spring Boot 버전은 확인 못 해 비워 둠). "문제 상황"의 첫 문단은 10월 23일 말로 복습 때 내 대답을 바탕으로 썼으니 실제 생각과 맞는지 본다.
+> 발행 전 확인: "직접 해본 결과"가 비어 있음(`[직접 작성]`). `rabbitmqctl set_policy` 명령은 문서를 직접 열어 확인하지 못했으니 [DLX 문서](https://rabbitmq.com/docs/dlx)의 예시와 맞는지 본다. 예제 기준 버전은 실제로 쓰는 버전(RabbitMQ 4.1.8, Spring Boot 3.5.16이 고르는 Spring AMQP 3.2.12)으로 바꿨다(2026-11-16). "문제 상황"의 첫 문단은 10월 23일 말로 복습 때 내 대답을 바탕으로 썼으니 실제 생각과 맞는지 본다.
+> 2026-11-16 보강(실제 운영 구성을 기준으로 초안에 없던 것): ① quorum 큐 재전달 한도를 직접 4로 잡기, ② direct DLX와 dead-letter 라우팅 키, ③ DLQ 보관 기간(TTL 15일)과 큐 인자를 나중에 못 바꾸는 문제, ④ 수동 ack(`MANUAL`) 리스너가 예외 경로에서 멈추는 함정, ⑤ publisher confirms와 mandatory, ⑥ DLQ 경보와 처리 원칙. ④는 Spring AMQP 3.2.12 소스와 RabbitMQ 4.1 문서를 따라간 결과이고 실제 브로커에서 재현하지는 않았다. ⑥의 지표 이름 `rabbitmq_queue_messages_ready`는 RabbitMQ 문서에 per-object 지표 이름이 따로 나와 있지 않으니 실제 `/metrics/per-object` 출력에서 확인한다. 이 보강 내용은 아직 답 노트([[DLQ]] 등)에는 없다.
 
 # RabbitMQ DLQ란? 메시지가 가는 4가지 경우와 운영에서 터지는 시나리오
 
@@ -17,6 +18,8 @@ version_info: RabbitMQ 4.0, Spring AMQP 4.0 (공식 문서 기준), Spring Boot 
 - DLQ(Dead Letter Queue)는 별도 종류의 큐가 아니라, 처리되지 못한 메시지가 DLX(Dead Letter Exchange)를 거쳐 모이는 일반 큐다.
 - DLX가 없거나 이름이 틀리면 메시지는 오류 없이 조용히 사라진다. RabbitMQ 4.0부터 quorum 큐(메시지를 여러 서버에 복제해 두는 큐 종류)는 소비자에게 20번 넘게 다시 전달된 메시지를 DLX가 없으면 삭제한다.
 - Spring AMQP의 `@RabbitListener`는 기본 설정 그대로 두면 예외가 나는 메시지를 무한히 재전달한다.
+- 그렇다고 수동 ack(소비자 코드가 처리 완료를 직접 알리는 방식)로 바꾸면, 이번에는 예외 경로에서 응답을 빠뜨린 소비자가 RabbitMQ 4.1 기본값으로 최대 30분 동안 멈출 수 있다.
+- 메시지는 생산자 쪽에서도 조용히 사라진다. 받아 줄 큐가 없는 메시지에도 브로커의 확인 응답(publisher confirm)은 성공으로 오기 때문에, 돌려받기 설정(mandatory)까지 켜야 알 수 있다.
 
 ## 문제 상황: DLQ만 있으면 메시지는 안전한 거 아닌가?
 DLQ를 처음 접했을 때는 "처리가 안 된 메시지가 모이는 큐" 정도로만 알고 있었다. 그래서 소비자(메시지를 받아 처리하는 애플리케이션)가 처리 도중에 죽더라도 DLQ가 그 메시지를 지켜 줄 것이라고 생각했다. 하지만 공식 문서를 따라가 보니 이 생각은 틀렸다. 소비자가 죽었을 때 메시지를 지키는 것은 DLQ가 아니라 ack(소비자가 "처리를 끝냈다"고 알려 주는 확인 응답) 방식이었고, DLQ는 전혀 다른 경우에 쓰이는 장치였다.
@@ -37,7 +40,7 @@ DLQ를 처음 접했을 때는 "처리가 안 된 메시지가 모이는 큐" �
 
 말로만 들으면 감이 잘 안 오니 코드에서 DLX와 DLQ가 어디에 나타나는지 보자. 다음은 Spring 설정 클래스 안에 주문 예시의 큐 두 개와 교환기 하나를 선언한 코드다.
 
-> 예제 기준: Spring AMQP 4.0(`QueueBuilder`), RabbitMQ 4.0 · Spring Boot 버전 확인 필요
+> 예제 기준: Spring AMQP 3.2(`QueueBuilder`), RabbitMQ 4.1, Spring Boot 3.5
 
 ```java
 @Bean
@@ -115,7 +118,7 @@ ack에는 자동과 수동이 있다. 자동 ack는 브로커가 메시지를 �
 
 DLX를 지정하는 방법도 하나 알아 두자. 큐를 만들 때 인자(`x-dead-letter-exchange`)로 넣을 수도 있지만, 문서는 이 방식보다 RabbitMQ 정책(policy)으로 지정하기를 권장한다. 정책은 큐 이름 패턴을 정해 두면 거기에 맞는 큐들에 브로커가 설정을 일괄 적용해 주는 기능이다. 둘 다 있으면 큐 인자가 우선한다. 앞에서 본 `deadLetterExchange("order.dlx")`가 바로 큐 인자 방식이어서, 구조를 눈으로 보기에는 좋지만 운영에서는 코드를 다시 배포해야 DLX를 바꿀 수 있다는 단점이 있다. 다음은 같은 설정을 정책으로 지정하는 명령이다.
 
-> 예제 기준: RabbitMQ 4.0의 `rabbitmqctl`
+> 예제 기준: RabbitMQ 4.1의 `rabbitmqctl`
 
 ```bash
 # 이름이 order.queue인 큐에 "죽은 메시지는 order.dlx로" 정책을 건다
@@ -127,7 +130,7 @@ rabbitmqctl set_policy order-dlx "^order\.queue$" '{"dead-letter-exchange":"orde
 ## Spring AMQP에서는 기본값이 무한 재전달이다
 위 표의 세 번째 시나리오, 즉 처리하지 못하는 메시지가 계속 큐로 돌아가는 상황은 남의 이야기가 아니다. Spring에서 `@RabbitListener`를 아무 설정 없이 쓰면 이것이 기본 동작이기 때문이다. 다음 코드를 보자.
 
-> 예제 기준: Spring AMQP 4.0(`@RabbitListener`), RabbitMQ 4.0 · Spring Boot 버전 확인 필요
+> 예제 기준: Spring AMQP 3.2(`@RabbitListener`), RabbitMQ 4.1, Spring Boot 3.5
 
 ```java
 // application.yml — 예외 난 메시지를 큐로 되돌리지 않음 (DLX가 있으면 DLQ로, 없으면 버려짐)
@@ -148,41 +151,161 @@ public void handle(OrderMessage msg) {
 여기서 먼저 헷갈리기 쉬운 것이 `AUTO`라는 이름이다. Spring의 `AUTO`는 앞에서 본 RabbitMQ의 자동 ack가 아니다. 리스너 메서드를 대신 실행해 주는 Spring의 리스너 컨테이너가, 메서드가 정상적으로 끝났으면 ack를, 예외가 났으면 nack를 브로커에 보내 주는 방식이고, RabbitMQ의 자동 ack에 해당하는 것은 Spring에서 `NONE`이다. Spring 문서에도 이 주의가 그대로 적혀 있다.
 > "Do not confuse with RabbitMQ autoAck which is represented by NONE here." ([Spring AMQP: AcknowledgeMode](https://docs.spring.io/spring-amqp/api/org/springframework/amqp/core/AcknowledgeMode.html))
 
-문제는 예외가 났을 때다. 리스너가 예외를 던진 메시지를 다시 큐에 넣을지 정하는 값이 `defaultRequeueRejected`인데, 이 값의 기본값이 `true`다 ([Spring AMQP: Container Attributes](https://docs.spring.io/spring-amqp/reference/4.0/amqp/containerAttributes.html)). 따라서 데이터 자체가 잘못돼서 몇 번을 다시 받아도 실패하는 메시지는 큐와 리스너 사이를 끝없이 오가게 된다.
+문제는 예외가 났을 때다. 리스너가 예외를 던진 메시지를 다시 큐에 넣을지 정하는 값이 `defaultRequeueRejected`인데, 이 값의 기본값이 `true`다 ([Spring AMQP 3.2: Container Attributes](https://docs.spring.io/spring-amqp/reference/3.2/amqp/containerAttributes.html)). 따라서 데이터 자체가 잘못돼서 몇 번을 다시 받아도 실패하는 메시지는 큐와 리스너 사이를 끝없이 오가게 된다.
 
-막는 방법은 두 가지다. 설정에서 `default-requeue-rejected`를 `false`로 바꾸거나, 위 코드처럼 다시 받을 필요가 없는 메시지에 대해서만 `AmqpRejectAndDontRequeueException`을 던지면 된다 ([Spring Boot: AMQP](https://docs.spring.io/spring-boot/reference/messaging/amqp.html)). 어느 쪽이든 그 메시지는 `requeue=false`로 거절되므로 DLX가 있으면 DLQ로 가고 없으면 버려진다 ([Spring AMQP: Exception Handling](https://docs.spring.io/spring-amqp/reference/amqp/exception-handling.html)). 결국 이 설정은 DLX 설정과 짝으로 해 줘야 의미가 있다.
+막는 방법은 두 가지다. 설정에서 `default-requeue-rejected`를 `false`로 바꾸거나, 위 코드처럼 다시 받을 필요가 없는 메시지에 대해서만 `AmqpRejectAndDontRequeueException`을 던지면 된다 ([Spring Boot: AMQP](https://docs.spring.io/spring-boot/reference/messaging/amqp.html)). 어느 쪽이든 그 메시지는 `requeue=false`로 거절되므로 DLX가 있으면 DLQ로 가고 없으면 버려진다 ([Spring AMQP 3.2: Exception Handling](https://docs.spring.io/spring-amqp/reference/3.2/amqp/exception-handling.html)). 결국 이 설정은 DLX 설정과 짝으로 해 줘야 의미가 있다.
+
+## 실제 운영에서는 어떻게 선언했을까?
+지금까지는 구조를 보기 쉽게 classic 큐와 fanout 교환기로 설명했는데, 실제로 운영하는 서비스(RabbitMQ 4.1.8, Spring Boot 3.5.16)에서는 선언이 조금 다르다. 차이는 세 가지다. 원래 큐를 quorum 큐로 만들면서 재전달 한도를 기본값 20 대신 4로 직접 잡았고, DLX를 direct 교환기로 만들면서 죽은 메시지에 붙일 라우팅 키를 따로 정했고, DLQ에도 메시지 보관 기간을 걸었다. 다음은 이것을 주문 예시의 이름으로 다시 쓴 코드다.
+
+> 예제 기준: Spring AMQP 3.2(`QueueBuilder`), RabbitMQ 4.1, Spring Boot 3.5
+
+```java
+@Bean
+Queue orderQueue() {
+    return QueueBuilder.durable("order.queue")
+            .quorum()                            // ← quorum 큐로 선언
+            .deliveryLimit(4)                    // ← 재전달 한도(delivery-limit): 기본 20 대신 4
+            .deadLetterExchange("order.dlx")     // ← DLX
+            .deadLetterRoutingKey("order.dead")  // ← dead-letter 라우팅 키: 죽은 메시지에 새로 붙일 키
+            .build();
+}
+@Bean
+DirectExchange orderDlx() { return new DirectExchange("order.dlx"); } // ← 키가 정확히 같은 큐에만 넘기는 교환기
+@Bean
+Queue orderDlq() {
+    return QueueBuilder.durable("order.dlq").quorum()
+            .ttl(15 * 24 * 60 * 60 * 1000)       // ← DLQ 보관 기간 15일(밀리초). 지나면 버려진다
+            .build();
+}
+@Bean
+Binding dlqBinding() {
+    return BindingBuilder.bind(orderDlq()).to(orderDlx()).with("order.dead"); // ← 같은 키로 묶는다
+}
+```
+
+이 코드에서 재전달 한도는 `deliveryLimit(4)` 줄이다. 이 값은 quorum 큐에만 적용되므로 바로 위의 `quorum()`과 짝으로 써야 한다 ([Spring AMQP: QueueBuilder](https://docs.spring.io/spring-amqp/api/org/springframework/amqp/core/QueueBuilder.html)). 한도를 작게 잡으면 처리하지 못하는 주문 메시지가 `order.queue`와 소비자 사이를 그만큼 덜 오가고, 더 빨리 `order.dlx`를 거쳐 `order.dlq`로 넘어간다 ([RabbitMQ: Quorum Queues](https://www.rabbitmq.com/docs/4.0/quorum-queues)).
+
+다음으로 볼 것은 DLX를 direct 교환기로 바꾼 부분이다. direct 교환기(direct exchange)는 메시지의 라우팅 키와 바인딩 키가 정확히 같은 큐에만 메시지를 넘겨주는 교환기다. 그래서 DLX를 direct로 만들면 죽은 메시지가 어떤 라우팅 키를 달고 DLX에 도착하는지가 중요해진다. RabbitMQ는 큐에 dead-letter 라우팅 키(`x-dead-letter-routing-key`)가 지정돼 있으면 그 키를 쓰고, 없으면 메시지가 처음 발행될 때 달고 있던 라우팅 키를 그대로 쓴다 ([RabbitMQ: Dead Letter Exchanges](https://rabbitmq.com/docs/dlx)). 예를 들어 주문 서비스가 `order.created`라는 키로 보낸 메시지가 죽었는데 `deadLetterRoutingKey` 줄을 빼먹었다면, 메시지는 `order.created`를 단 채로 `order.dlx`에 도착한다. 그런데 `order.dlq`는 `order.dead`로 묶여 있으므로 받아 줄 큐가 없고, 앞에서 본 바인딩 누락과 똑같이 오류 없이 사라진다. 따라서 direct DLX를 쓸 때는 `deadLetterRoutingKey`와 바인딩의 `with(...)`에 같은 키를 넣었는지 꼭 맞춰 보자.
+
+마지막으로 `order.dlq`의 `ttl(...)`은 앞에서 본 메시지 TTL을 DLQ 자체에 건 것이다. DLQ는 보통 꺼내 가는 소비자가 없어서 그냥 두면 계속 쌓이기만 하는데, RabbitMQ는 디스크 남은 공간이 한도(`disk_free_limit`, 기본 50MB) 아래로 떨어지면 모든 생산자를 막아 버린다 ([RabbitMQ: Disk Alarms](https://www.rabbitmq.com/docs/disk-alarms)). 그래서 원인을 확인할 시간(여기서는 15일)만 남기고 그 뒤에는 지워지게 했다. `order.dlq`에는 DLX가 없으므로 만료된 메시지는 다른 곳으로 가지 않고 버려진다 ([RabbitMQ: TTL](https://www.rabbitmq.com/docs/ttl)).
+
+그런데 이 선언에는 약점이 하나 있다. 앞에서 문서가 정책을 권장한다고 했는데, 여기서는 큐 인자로 선언했다는 점이다. 큐 인자 중에는 큐를 처음 만들 때 정해지면 그 큐가 없어질 때까지 바꿀 수 없는 것이 있고, 이미 있는 큐를 다른 인자로 다시 선언하면 브로커가 `PRECONDITION_FAILED`(406) 오류를 낸다 ([RabbitMQ: Queues](https://www.rabbitmq.com/docs/queues)). 예를 들어 운영 중에 DLQ 보관 기간을 15일에서 30일로 바꾸고 코드만 다시 배포하면, 애플리케이션이 `order.dlq`를 다시 선언하는 순간 이 오류가 난다. 정책은 언제든 바꿀 수 있으므로, 나중에 바꿀 가능성이 있는 값(재전달 한도, TTL, DLX)은 처음부터 정책으로 거는 편이 낫다.
+
+## 수동 ack로 바꾸면 이번엔 소비자가 멈출 수 있다
+앞에서 Spring의 기본 ack 모드인 `AUTO`가 예외 난 메시지를 무한히 돌려보낸다는 것을 봤다. 실제 운영에서는 이 모드 대신 수동 ack(Spring에서 `MANUAL`)를 쓰는데, `MANUAL`은 컨테이너가 아니라 리스너 코드가 직접 `basicAck`(처리 완료)나 `basicReject`(거절)를 불러야 하는 방식이다 ([Spring AMQP 3.2: Container Attributes](https://docs.spring.io/spring-amqp/reference/3.2/amqp/containerAttributes.html)). 처리 결과를 다음 단계로 넘긴 것이 확실해진 뒤에 ack하는 것처럼, 응답을 보내는 시점을 코드가 정할 수 있어서 쓴다. 다음은 수동 ack 리스너를 주문 예시로 쓴 것이다. 리스너 메서드는 메시지를 받은 `Channel`과, `@Header`로 꺼낸 delivery tag(채널 안에서 이 메시지를 가리키는 번호)를 인자로 받을 수 있다 ([Spring AMQP 3.2: Annotated Endpoint Method Signature](https://docs.spring.io/spring-amqp/reference/3.2/amqp/receiving-messages/async-annotation-driven/enable-signature.html)).
+
+> 예제 기준: Spring AMQP 3.2(`@RabbitListener`, `Channel`), RabbitMQ 4.1, Spring Boot 3.5
+
+```java
+// application.yml
+// spring.rabbitmq.listener.simple.acknowledge-mode: manual  ← 수동 ack
+// spring.rabbitmq.listener.simple.prefetch: 1               ← ack 안 된 메시지는 소비자당 1개까지만
+
+@RabbitListener(queues = "order.queue")
+public void handle(OrderMessage msg, Channel channel,
+                   @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
+    try {
+        orderService.process(msg);
+        channel.basicAck(tag, false);     // ← 처리 끝: ack
+    } catch (Exception e) {
+        channel.basicReject(tag, false);  // ← requeue=false로 거절 → order.dlx → order.dlq
+    }                                     //   이 catch가 없으면 예외 때 아무 응답도 가지 않는다
+}
+```
+
+이 리스너에서 정상 처리된 주문 메시지는 `basicAck`로 끝나고, 처리 중 예외가 난 주문 메시지는 `catch`의 `basicReject(tag, false)`로 거절되어 `order.dlx`를 거쳐 `order.dlq`에 쌓인다. 문제는 이 `catch`를 빠뜨렸을 때다. `AUTO`에서는 예외가 나면 컨테이너가 대신 거절을 보내 줬지만, `MANUAL`에서는 리스너가 예외를 던져도 컨테이너가 거절을 보내지 않는다. Spring AMQP 3.2.12 소스의 `BlockingQueueConsumer.rollbackOnExceptionIfNecessary`를 보면 수동 모드일 때는 특정 거절 예외가 아니면 nack나 reject를 보내지 않도록 조건이 걸려 있다 ([Spring AMQP 3.2.12 소스](https://github.com/spring-projects/spring-amqp/blob/v3.2.12/spring-rabbit/src/main/java/org/springframework/amqp/rabbit/listener/BlockingQueueConsumer.java)). 그러면 그 주문 메시지는 ack도 거절도 안 된 상태(unacked)로 소비자에게 붙잡혀 있게 된다.
+
+여기에 prefetch가 겹친다. prefetch는 한 채널에서 ack를 받지 않은 채 소비자에게 보내 둘 수 있는 메시지 수의 상한이고, 이 수에 닿으면 RabbitMQ는 하나라도 ack될 때까지 그 채널로 메시지를 더 보내지 않는다 ([RabbitMQ: Consumer Acknowledgements](https://www.rabbitmq.com/docs/confirms)). Spring의 기본 prefetch는 250인데 ([Spring AMQP 3.2: Container Attributes](https://docs.spring.io/spring-amqp/reference/3.2/amqp/containerAttributes.html)), 위 설정처럼 1로 두면 응답을 못 받은 메시지 하나가 그 소비자를 통째로 멈춰 세운다. 이 상태는 consumer timeout(소비자가 ack하지 않고 메시지를 붙잡고 있을 수 있는 최대 시간)이 지나야 풀린다. RabbitMQ 4.1 문서 기준 기본값은 30분이고, 시간이 지나면 브로커가 그 채널을 `PRECONDITION_FAILED`로 닫으면서 채널에 붙잡혀 있던 메시지를 모두 큐로 되돌린다 ([RabbitMQ 4.1: Consumers](https://www.rabbitmq.com/docs/4.1/consumers)). 결국 예외 한 번에 그 소비자가 최대 30분 동안 일을 하지 않는 셈이다. 소비자가 여러 개면 나머지가 일을 받아 가겠지만, 같은 예외가 소비자 수만큼 겹치면 큐 전체가 멈춘다.
+
+참고로 이렇게 되돌아간 메시지가 quorum 큐의 재전달 횟수에 들어가는지는 버전마다 다르다. 최신(4.3) 문서는 `basic.reject`와 소비자 연결 끊김은 세고 `basic.nack`와 consumer timeout은 세지 않는다고 적고 있고 ([RabbitMQ: Quorum Queues](https://www.rabbitmq.com/docs/quorum-queues)), 4.1 문서에는 이 구분이 나와 있지 않다 ([RabbitMQ 4.1: Quorum Queues](https://www.rabbitmq.com/docs/4.1/quorum-queues)). 세지 않는 버전이라면 같은 메시지가 멈췄다 풀리기를 반복하면서도 DLQ로는 가지 않을 수 있다.
+
+따라서 수동 ack를 쓸 때는 위 코드처럼 예외 경로까지 포함해 모든 길에서 `basicAck`나 `basicReject` 중 하나가 반드시 불리게 해야 한다. 다만 본문을 `OrderMessage`로 바꾸는 변환 단계에서 실패한 메시지는 리스너가 불리기 전이라 코드가 응답할 기회가 없는데, 이 경우는 Spring AMQP 2.1.9부터 수동 모드에서도 Spring이 requeue 없이 거절해 준다 ([Spring AMQP 3.2: Exception Handling](https://docs.spring.io/spring-amqp/reference/3.2/amqp/exception-handling.html)).
+
+## 생산자 쪽에서도 메시지는 조용히 사라진다
+지금까지는 소비자가 메시지를 받은 뒤의 이야기였는데, 메시지는 큐에 들어가기도 전에 사라질 수도 있다. 교환기가 받은 메시지를 넘겨줄 큐를 하나도 찾지 못하면(이런 메시지를 unroutable 메시지라고 한다) RabbitMQ는 기본적으로 그 메시지를 버리기 때문이다 ([RabbitMQ: Publishers](https://www.rabbitmq.com/docs/publishers)). 바인딩 키를 잘못 적었거나 큐가 아직 없을 때, 생산자는 이 사실을 모른 채 지나간다.
+
+이것을 알아내려면 두 가지 장치를 함께 켜야 한다. 하나는 publisher confirms로, 브로커가 메시지를 안전하게 받았는지를 생산자에게 ack(받음)나 nack(못 받음)로 알려 주는 확인 응답이다. 다른 하나는 mandatory 플래그로, 메시지를 보낼 때 이 값을 켜 두면 받아 줄 큐가 없는 메시지를 버리지 않고 생산자에게 돌려준다(return). 둘 중 하나만으로는 부족한 이유는 RabbitMQ가 unroutable 메시지에도 "어느 큐로도 갈 수 없다는 것을 확인했다"는 뜻으로 confirm ack를 보내기 때문이다. mandatory를 켜 두면 돌려주는 응답이 이 ack보다 먼저 도착한다 ([RabbitMQ: Consumer Acknowledgements and Publisher Confirms](https://www.rabbitmq.com/docs/confirms)). 즉 ack만 보고 성공으로 처리하면 버려진 메시지도 성공으로 보인다. 다음 코드를 보자.
+
+> 예제 기준: Spring AMQP 3.2(`RabbitTemplate`, `CorrelationData`), RabbitMQ 4.1, Spring Boot 3.5
+
+```java
+// application.yml
+// spring.rabbitmq.publisher-confirm-type: correlated  ← publisher confirms를 메시지별로 받기
+// spring.rabbitmq.publisher-returns: true             ← 돌려받은 메시지를 받을 수 있게
+// spring.rabbitmq.template.mandatory: true            ← mandatory 플래그 켜기
+
+CorrelationData cd = new CorrelationData(msg.id());  // 이 메시지의 확인 응답을 받을 그릇
+rabbitTemplate.convertAndSend("order.exchange", "order.created", msg, cd);
+CorrelationData.Confirm confirm = cd.getFuture().get(10, TimeUnit.SECONDS);
+if (!confirm.isAck()) throw new IllegalStateException("브로커가 받지 못함");      // ← nack
+if (cd.getReturned() != null) throw new IllegalStateException("받아 줄 큐 없음"); // ← ack가 와도 돌려받았으면 실패
+```
+
+이 코드에서 publisher confirms를 켜는 것은 `publisher-confirm-type: correlated` 줄이고, mandatory는 `template.mandatory: true` 줄이다 ([Spring AMQP 3.2: RabbitTemplate](https://docs.spring.io/spring-amqp/reference/3.2/amqp/template.html)). 주문 메시지가 `order.exchange`에서 `order.created` 키로 `order.queue`에 들어가면 ack가 오고 끝난다. 반대로 바인딩이 틀려서 갈 곳이 없으면, 돌려받은 메시지가 `cd`에 먼저 담긴 뒤에 ack가 오므로 마지막 `if`에 걸린다. Spring은 ack를 알리기 전에 돌려받은 메시지를 먼저 채워 두는 것을 보장하므로, 이 순서로 검사하면 된다.
+
+이 확인은 소비자가 처리 결과를 다른 큐로 다시 보낼 때도 그대로 쓸 수 있다. 앞 절의 수동 ack 리스너가 처리 결과를 다른 큐로 보낸다고 하자. 그러면 결과 메시지가 확인되고 돌려받지도 않았을 때만 원래 주문 메시지를 ack하고, 돌려받았다면 원래 메시지를 `basicReject(tag, false)`로 거절해 `order.dlq`에 남기면 된다. 이렇게 해야 결과는 사라졌는데 원래 주문 메시지까지 ack되어 둘 다 잃어버리는 일을 막을 수 있다. 확인 응답을 기다리다 시간이 지나 예외가 나는 경우도 있으니, 앞 절에서 본 것처럼 그 예외 역시 `catch`에서 거절로 이어지게 해야 한다.
+
+## DLQ에 메시지가 쌓이면 어떻게 알 수 있을까?
+DLX와 DLQ를 제대로 만들었어도 아무도 `order.dlq`를 보지 않으면, 메시지가 조용히 사라지는 것과 크게 다르지 않다. 게다가 앞에서 DLQ에 15일 보관 기간을 걸었으니 그 안에 알아채야 한다. 그래서 DLQ에 메시지가 하나라도 들어오면 경보가 울리게 했다. 이때 쓴 것이 Prometheus(지표를 주기적으로 모아 저장하고, 조건에 맞으면 경보를 내는 모니터링 도구)다. RabbitMQ의 Prometheus 플러그인은 기본 15692 포트로 지표를 내보내는데, 기본 경로 `/metrics`는 큐 전체를 합친 값만 주므로 큐별 값을 보려면 `/metrics/per-object`를 따로 수집해야 한다 ([RabbitMQ: Prometheus](https://www.rabbitmq.com/docs/prometheus)). 다음은 그렇게 모은 지표로 `order.dlq`에 꺼내 가길 기다리는 메시지가 1분 넘게 0보다 많으면 울리는 경보 규칙이다.
+
+> 예제 기준: RabbitMQ 4.1 `rabbitmq_prometheus` 플러그인, Prometheus 경보 규칙 · 지표 이름은 `/metrics/per-object` 출력에서 확인 필요
+
+```yaml
+- alert: OrderDlqNotEmpty
+  expr: max(rabbitmq_queue_messages_ready{queue="order.dlq"}) > 0  # ← DLQ에서 꺼내 가길 기다리는 메시지 수
+  for: 1m                                                           # ← 1분 넘게 이어질 때만 울림
+```
+
+경보가 울렸을 때 지킬 원칙도 함께 정해 두었다. DLQ를 통째로 비우거나(purge) 메시지를 아무렇게나 원래 큐로 다시 보내지 않고, 먼저 앞에서 본 `x-death` 헤더로 어느 큐에서 왜 죽었는지를 보고 같은 시간대의 애플리케이션 로그에서 발행·처리 실패 기록을 찾는다. 원인과 재처리 방법이 정해진 뒤에만 관리 화면이나 정해진 도구로 처리하고, 그렇지 않은 메시지는 보관 기간이 지나 저절로 만료되게 둔다. DLQ에 메시지가 있다는 것은 그 원인이 아직 남아 있다는 뜻이므로, 원인을 고치기 전에 다시 넣으면 같은 메시지가 다시 DLQ로 돌아올 뿐이기 때문이다.
 
 ## 직접 해본 결과
 [직접 작성] 아래를 내 환경에서 실행해 보고 결과를 회사 정보 없이 적는다.
 
-> 예제 기준: RabbitMQ 4.0의 `rabbitmqctl`
+> 예제 기준: RabbitMQ 4.1의 `rabbitmqctl`
 
  `rabbitmqctl`은 RabbitMQ 서버(노드)를 관리하는 명령줄 도구이고, `list_queues` 뒤에 붙는 단어들은 옵션이 아니라 보여 줄 열 이름이다 ([rabbitmqctl(8)](https://www.rabbitmq.com/docs/man/rabbitmqctl.8)).
 - `rabbitmqctl version`: 4.0 이상인지 (이상이면 quorum 큐 재전달 한도 20이 적용된다)
 - `rabbitmqctl list_policies`: `dead-letter-exchange`를 지정한 정책이 있는지
 - `rabbitmqctl list_queues name type messages policy`: quorum 큐인데 DLX 정책이 없는 큐가 있는지 (열은 차례로 큐 이름, 큐 종류, 쌓인 메시지 수, 적용된 정책)
 - Spring 설정에 `default-requeue-rejected`와 `acknowledge-mode`를 따로 지정했는지 (안 했으면 AUTO에 requeue=true)
+- `rabbitmqctl list_queues name messages_ready messages_unacknowledged consumers`: 수동 ack 소비자가 멈춰 있지 않은지 (열은 차례로 큐 이름, 꺼내 가길 기다리는 메시지 수, ack를 기다리는 메시지 수, 소비자 수. ack를 기다리는 수가 소비자 수 × prefetch에 붙은 채 오래 줄지 않으면 의심한다)
+- Spring 설정에 `publisher-confirm-type`, `publisher-returns`, `template.mandatory`가 켜져 있는지
+- 받아 줄 큐가 없는 라우팅 키로 한 건을 일부러 보내 보고, confirm ack와 돌려받은 메시지가 둘 다 오는지
+- direct DLX라면 큐의 dead-letter 라우팅 키와 DLQ 바인딩 키가 같은지 (`rabbitmqctl list_bindings`로 바인딩 키를 본다)
 
 ## 함정과 주의점
 - DLQ는 소비자 장애 대비책이 아니다. 그 역할은 수동 ack가 한다.
 - DLX를 만든 뒤에는 메시지가 실제로 DLQ에 쌓이는지 한 번 확인한다. 이름이 틀려도 오류가 나지 않기 때문이다.
 - Spring의 `default-requeue-rejected`는 DLX 설정과 함께 바꾼다.
+- direct DLX를 쓰면 dead-letter 라우팅 키와 DLQ 바인딩 키를 같게 맞춘다. 안 맞으면 DLX까지 와서 사라진다.
+- 수동 ack(`MANUAL`)에서는 예외 경로까지 ack나 reject를 직접 보낸다. 빠뜨리면 무한 재전달 대신 소비자가 consumer timeout(4.1 기본 30분)까지 멈춘다.
+- publisher confirms의 ack만 보고 성공으로 치지 않는다. mandatory로 돌려받은 메시지가 있는지도 같이 본다.
+- 나중에 바꿀 수 있는 값(재전달 한도, TTL, DLX)은 큐 인자 대신 정책으로 건다. 큐 인자는 다른 값으로 다시 선언하면 오류가 난다.
+- DLQ에도 보관 기간과 경보를 둔다. 아무도 보지 않는 DLQ는 디스크만 차지한다.
 
 ## 마무리
-지금까지 DLQ가 DLX를 거쳐 메시지가 모이는 일반 큐라는 것, 메시지가 DLQ로 가는 네 가지 경우, 그리고 설정이 빠졌을 때 메시지가 조용히 사라지는 시나리오를 알아보았다. DLQ의 구조 자체는 단순하다. 다만 DLX를 지정하지 않았거나 이름이 틀렸을 때는 처리하지 못한 메시지가 오류 하나 없이 사라진다는 점만은 꼭 기억해 두자. 다음에는 이 글에서 이름만 나온 개념들을 이어서 정리해 볼 생각이다.
+지금까지 DLQ가 DLX를 거쳐 메시지가 모이는 일반 큐라는 것, 메시지가 DLQ로 가는 네 가지 경우, 설정이 빠졌을 때 메시지가 조용히 사라지는 시나리오, 그리고 실제 운영에서 재전달 한도·dead-letter 라우팅 키·DLQ 보관 기간을 어떻게 잡았고 수동 ack와 publisher confirms에서 무엇을 조심해야 하는지를 알아보았다. DLQ의 구조 자체는 단순하다. 다만 DLX를 지정하지 않았거나 이름이 틀렸을 때는 처리하지 못한 메시지가 오류 하나 없이 사라진다는 점만은 꼭 기억해 두자. 다음에는 이 글에서 이름만 나온 개념들을 이어서 정리해 볼 생각이다.
 - 재시도 큐 패턴: TTL 대기 큐와 DLX를 묶어 일정 시간 뒤에 다시 처리하는 구성
 - quorum 큐: 여러 서버에 복제되는 큐가 내부에서 어떻게 동작하는지
-- publisher confirms: 브로커가 메시지를 안전하게 받았다고 생산자에게 알려 주는 확인
+- publisher confirms: 이 글에서는 확인 응답을 기다리기만 했는데, nack가 오거나 시간이 지났을 때 다시 보내는 방법
 
 ## 참고 자료
 - [RabbitMQ: Queues](https://www.rabbitmq.com/docs/queues)
 - [RabbitMQ: Dead Letter Exchanges](https://rabbitmq.com/docs/dlx)
 - [RabbitMQ: Consumer Acknowledgements](https://www.rabbitmq.com/docs/confirms)
-- [RabbitMQ: Quorum Queues (4.0)](https://www.rabbitmq.com/docs/4.0/quorum-queues)
+- [RabbitMQ: Quorum Queues (4.0)](https://www.rabbitmq.com/docs/4.0/quorum-queues) · [4.1](https://www.rabbitmq.com/docs/4.1/quorum-queues) · [최신(4.3 이후 재전달 횟수 기준)](https://www.rabbitmq.com/docs/quorum-queues)
+- [RabbitMQ 4.1: Consumers (consumer timeout)](https://www.rabbitmq.com/docs/4.1/consumers)
+- [RabbitMQ: Publishers](https://www.rabbitmq.com/docs/publishers)
+- [RabbitMQ: Time-To-Live and Expiration](https://www.rabbitmq.com/docs/ttl)
+- [RabbitMQ: Disk Alarms](https://www.rabbitmq.com/docs/disk-alarms)
+- [RabbitMQ: Prometheus](https://www.rabbitmq.com/docs/prometheus)
 - [Spring AMQP: QueueBuilder](https://docs.spring.io/spring-amqp/api/org/springframework/amqp/core/QueueBuilder.html)
 - [rabbitmqctl(8)](https://www.rabbitmq.com/docs/man/rabbitmqctl.8)
-- [Spring AMQP: AcknowledgeMode](https://docs.spring.io/spring-amqp/api/org/springframework/amqp/core/AcknowledgeMode.html) · [Container Attributes](https://docs.spring.io/spring-amqp/reference/4.0/amqp/containerAttributes.html) · [Exception Handling](https://docs.spring.io/spring-amqp/reference/amqp/exception-handling.html)
+- [Spring AMQP: AcknowledgeMode](https://docs.spring.io/spring-amqp/api/org/springframework/amqp/core/AcknowledgeMode.html) · [Container Attributes (3.2)](https://docs.spring.io/spring-amqp/reference/3.2/amqp/containerAttributes.html) · [Exception Handling (3.2)](https://docs.spring.io/spring-amqp/reference/3.2/amqp/exception-handling.html)
+- [Spring AMQP 3.2: Annotated Endpoint Method Signature](https://docs.spring.io/spring-amqp/reference/3.2/amqp/receiving-messages/async-annotation-driven/enable-signature.html) · [RabbitTemplate (Correlated Publisher Confirms and Returns)](https://docs.spring.io/spring-amqp/reference/3.2/amqp/template.html)
+- [Spring AMQP 3.2.12 소스: BlockingQueueConsumer](https://github.com/spring-projects/spring-amqp/blob/v3.2.12/spring-rabbit/src/main/java/org/springframework/amqp/rabbit/listener/BlockingQueueConsumer.java)
 - [Spring Boot: AMQP](https://docs.spring.io/spring-boot/reference/messaging/amqp.html)
 
 ---
-작성일: 2026-11-16 · 버전: 초안(재작성본) · 수정 이력: 2026-11-05 초안을 새 말투 규칙으로 다시 씀
+작성일: 2026-11-16 · 버전: 초안(재작성본) · 수정 이력: 2026-11-05 초안을 새 말투 규칙으로 다시 씀; 2026-11-16 실제 운영 구성(RabbitMQ 4.1.8, Spring Boot 3.5.16) 기준으로 운영 선언·수동 ack·publisher confirms·DLQ 경보 보강

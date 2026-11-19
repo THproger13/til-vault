@@ -17,6 +17,11 @@
 - [[KV 캐시]] — 처리한 토큰의 K·V를 저장해 재계산을 없애는 메모리. 크기가 요청 수·토큰 수에 비례. vLLM은 공용 블록, Ollama는 슬롯 × 컨텍스트로 잡음 (draft)
 - [[vLLM과 Ollama 동시성 차이]] — vLLM은 스텝마다 토큰 예산으로 배치를 다시 짜고 모자라면 preemption, Ollama는 슬롯(기본 1)과 큐. 작동 과정별 표 (draft)
 - [[vLLM과 Ollama 설정값과 튜닝]] — max-num-batched-tokens 등 설정값 의미와 증상별 조치, ITL·TTFT 맞바꿈, Ollama는 NUM_PARALLEL × CONTEXT_LENGTH 메모리 (draft)
+- [[HA 클러스터 VIP와 하트비트]] — 통신 경로(하트비트)는 LifeKeeper 문서상 노드 간 통신 수단이며 하나뿐이면 NIC·라우터가 단일 장애점. VIP 정의·스플릿 브레인은 미확인 (draft)
+- [[공유 디스크 HA와 스트리밍 복제 HA 차이]] — 데이터 한 벌 공유 vs 서버마다 한 벌+WAL 복제. 대기 노드에 PG가 이미 포트를 잡고 있으면 넘길 때 EADDRINUSE (draft)
+- [[같은 포트를 두 프로세스가 못 쓰는 이유]] — bind의 EADDRINUSE, PG 소켓 .lock은 소켓 파일을 이식성 있게 잠글 수 없어 둔 일반 파일 (draft)
+- [[PostgreSQL 복제 슬롯]] — 대기 서버가 받을 때까지 WAL을 보존. 대기가 멈추면 pg_wal이 찰 수 있어 max_slot_wal_keep_size로 상한, active는 스트리밍 중 여부 (draft)
+- [[HA 클러스터 관리 서비스와 부팅 자동 시작]] — 클러스터가 제어할 systemd 서비스는 enable하지 않는다(Pacemaker 문서). enable은 시작이 아니라 링크 생성, failed 상태 읽기 (draft)
 
 ### 씨앗 (연관 개념, 아직 질문 전)
 
@@ -67,5 +72,10 @@
 - [[continuous batching]] — 씨앗. 배치를 스텝마다 다시 구성해 요청을 빼고 넣는 방식 (unexplored)
 - [[prefix caching]] — 씨앗. 같은 접두어의 KV 캐시 블록을 재사용하는 최적화 (unexplored)
 - [[llama.cpp 슬롯]] — 씨앗. llama.cpp 서버의 동시 처리 칸. KV 캐시를 칸 수 × 칸당 토큰으로 잡음 (unexplored)
+
+#### HA 클러스터
+- [[HA 클러스터]] — 씨앗. 서버 여러 대가 한 서비스를 맡고 한 대가 못 쓰면 다른 대가 이어받는 구성 (unexplored)
+- [[PostgreSQL 스트리밍 복제]] — 씨앗. 대기 서버가 주 서버의 WAL 흐름을 받아 따라가는 복제 (unexplored)
+- [[WAL]] — 씨앗. write-ahead log. 대기 서버가 읽는 기록 흐름 (unexplored)
 
 ## 개발 외 (life)

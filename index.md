@@ -22,6 +22,11 @@
 - [[같은 포트를 두 프로세스가 못 쓰는 이유]] — bind의 EADDRINUSE, PG 소켓 .lock은 소켓 파일을 이식성 있게 잠글 수 없어 둔 일반 파일 (draft)
 - [[PostgreSQL 복제 슬롯]] — 대기 서버가 받을 때까지 WAL을 보존. 대기가 멈추면 pg_wal이 찰 수 있어 max_slot_wal_keep_size로 상한, active는 스트리밍 중 여부 (draft)
 - [[HA 클러스터 관리 서비스와 부팅 자동 시작]] — 클러스터가 제어할 systemd 서비스는 enable하지 않는다(Pacemaker 문서). enable은 시작이 아니라 링크 생성, failed 상태 읽기 (draft)
+- [[리눅스 NIC 이름 결정 방식]] — ens3의 en은 이더넷, s는 PCI 슬롯. NamePolicy 순서로 정해지고 커널 이름은 재부팅 사이 불안정. ens8과 슬롯 이름 불일치는 열린 질문 (draft)
+- [[udev 규칙과 systemd link 파일 차이]] — 규칙은 맞는 줄 모두, .link는 첫 번째 맞는 파일만. 다른 이름 복사는 원본이 남음, Name=은 NamePolicy=보다 약함 (draft)
+- [[dracut과 initramfs]] — initramfs는 부팅 초기 이미지, dracut이 만듦. 인자 없으면 실행 중 커널 기준, --kver로 지정 (draft)
+- [[클라우드 메타데이터 network_data.json]] — 169.254.169.254에서 읽는 NIC·네트워크 JSON. type ipv4/ipv4_dhcp, ip_address·netmask·routes는 선택 필드, 빈 routes 허용 (draft)
+- [[두 번째 NIC의 DEFROUTE]] — DEFROUTE=no는 이 연결에 기본 경로를 주지 않음(NetworkManager). 응답 경로 문제는 미확인 (draft)
 
 ### 씨앗 (연관 개념, 아직 질문 전)
 
@@ -74,6 +79,9 @@
 - [[llama.cpp 슬롯]] — 씨앗. llama.cpp 서버의 동시 처리 칸. KV 캐시를 칸 수 × 칸당 토큰으로 잡음 (unexplored)
 
 #### HA 클러스터
+- [[메타데이터 서비스]] — 씨앗. VM 안에서 169.254.169.254로 읽는 클라우드 정보 서비스 (unexplored)
+- [[NetworkManager]] — 씨앗. ifcfg-rh 플러그인으로 ifcfg 파일을 읽고 쓰는 네트워크 설정 프로그램 (unexplored)
+- [[systemd-udevd]] — 씨앗. .link의 이름 정책을 받아 NAME을 정하는 쪽 (unexplored)
 - [[HA 클러스터]] — 씨앗. 서버 여러 대가 한 서비스를 맡고 한 대가 못 쓰면 다른 대가 이어받는 구성 (unexplored)
 - [[PostgreSQL 스트리밍 복제]] — 씨앗. 대기 서버가 주 서버의 WAL 흐름을 받아 따라가는 복제 (unexplored)
 - [[WAL]] — 씨앗. write-ahead log. 대기 서버가 읽는 기록 흐름 (unexplored)
